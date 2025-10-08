@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "750680549973",
+    "project_id": "betabuddy-3f4ed",
+    "storage_bucket": "betabuddy-3f4ed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:750680549973:android:87fe9ac21eef221f1542dc",
+        "android_client_info": {
+          "package_name": "com.example.betabuddy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZoOGsuo5U9h3UjL0ruxrZDmPdJJ5Cx60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
