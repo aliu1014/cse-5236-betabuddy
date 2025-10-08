@@ -24,15 +24,15 @@
         android:layout_height="wrap_content"
         android:hint="@string/username_hint"
         android:inputType="textEmailAddress"
-        android:autofillHints="emailAddress"/>     <!-- ✅ added autofill -->
+        android:autofillHints="emailAddress"/>
 
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/password_hint"
+        android:hint="Password"
         android:inputType="textPassword"
-        android:autofillHints="password"/>         <!-- ✅ added autofill -->
+        android:imeOptions="actionDone" />
 
     <Button
         android:id="@+id/btnLogin"
