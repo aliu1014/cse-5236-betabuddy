@@ -1,47 +1,27 @@
 package com.example.betabuddy
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.betabuddy.ui.theme.BetaBuddyTheme
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.example.betabuddy.login.LoginFragment
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+    private val tag = "ActivityLifecycle:MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            BetaBuddyTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        Log.d(tag, "onCreate()")
+        setContentView(R.layout.activity_main)
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container_view, LoginFragment())
+                .commitNow()
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BetaBuddyTheme {
-        Greeting("Android")
-    }
+    override fun onStart()  { super.onStart();  Log.d(tag, "onStart()") }
+    override fun onResume() { super.onResume(); Log.d(tag, "onResume()") }
+    override fun onPause()  { Log.d(tag, "onPause()");  super.onPause() }
+    override fun onStop()   { Log.d(tag, "onStop()");   super.onStop() }
+    override fun onDestroy(){ Log.d(tag, "onDestroy()");super.onDestroy() }
 }
