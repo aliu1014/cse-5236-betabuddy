@@ -1,3 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App name -->
     <string name="app_name">BetaBuddy</string>
+
+    <!-- Login / Signup -->
+    <string name="welcome_message">Welcome to BetaBuddy</string>
+    <string name="username_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button">Log In</string>
+    <string name="signup_button">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="dont_have_account">Don’t have an account? Sign up</string>
+    <string name="ok">OK</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="confirm_delete">Are you sure you want to delete your account?</string>
+    <string name="error_login_failed">Login failed. Please check your credentials.</string>
+
+    <!-- Home -->
+    <string name="find_friends">Find Friends</string>
+    <string name="view_profile">View Profile</string>
+    <string name="view_friends">View Friends</string>
+
+    <!-- Find Friends -->
+    <string name="filter_by_location">Filter by location</string>
+    <string name="search">Search</string>
+    <string name="pending_requests">Pending</string>
+    <string name="send_request">Send Request</string>
+    <string name="set_location">Set Location</string>
+    <string name="view_info">View Info</string>
+
+    <!-- Profile -->
+    <string name="name">Name</string>
+    <string name="age">Age</string>
+    <string name="gender">Gender</string>
+    <string name="height">Height</string>
+    <string name="weight">Weight</string>
+    <string name="location">Location</string>
+    <string name="schedule">Schedule</string>
+    <string name="skill_level">Skill Level</string>
+    <string name="climbing_style">Climbing Style</string>
+    <string name="gear">Gear</string>
+    <string name="certifications">Certifications</string>
+    <string name="save">Save</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="add_location">Add Location</string>
+    <string name="add_schedule">Add Schedule</string>
+    <string name="edit_schedule">Edit Schedule</string>
+    <string name="profile_saved">Profile saved successfully</string>
+
+    <!-- Friends -->
+    <string name="friends">Friends</string>
+    <string name="friend_list_empty">You have no friends yet.</string>
+    <string name="chat">Chat</string>
+
+    <!-- Pending Requests -->
+    <string name="friend_requests">Friend Requests</string>
+    <string name="accept">Accept</string>
+    <string name="deny">Deny</string>
+    <string name="no_requests">No pending friend requests.</string>
+
+    <!-- General UI -->
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>

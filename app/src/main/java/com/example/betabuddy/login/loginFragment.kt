@@ -3,6 +3,7 @@ package com.example.betabuddy.login
 import androidx.fragment.app.Fragment
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
+import com.example.betabuddy.home.HomeFragment
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -23,9 +24,9 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
         auth = FirebaseAuth.getInstance()
 
         // Connect UI elements
-        val usernameInput = view.findViewById<EditText>(R.id.usernameInput)
-        val passwordInput = view.findViewById<EditText>(R.id.passwordInput)
-        val loginButton = view.findViewById<Button>(R.id.loginButton)
+        val usernameInput = view.findViewById<EditText>(R.id.etEmail)
+        val passwordInput = view.findViewById<EditText>(R.id.etPassword)
+        val loginButton = view.findViewById<Button>(R.id.btnLogin)
         val signupButton = view.findViewById<Button>(R.id.btnSignup)
 
         // Handle Login
@@ -35,6 +36,10 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 signInUser(email, password)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container_view, HomeFragment())
+                    .addToBackStack(null)
+                    .commit()
             } else {
                 Toast.makeText(requireContext(), "Please enter both email and password", Toast.LENGTH_SHORT).show()
             }

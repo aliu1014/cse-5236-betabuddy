@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:padding="24dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+
+        <EditText android:id="@+id/etName"
+            android:layout_width="match_parent" android:layout_height="56dp"
+            android:hint="@string/name" android:padding="12dp"/>
+        <EditText android:id="@+id/etLocation"
+            android:layout_width="match_parent" android:layout_height="56dp"
+            android:layout_marginTop="8dp" android:hint="@string/location" android:padding="12dp"/>
+        <EditText android:id="@+id/etSkill"
+            android:layout_width="match_parent" android:layout_height="56dp"
+            android:layout_marginTop="8dp" android:hint="@string/skill_level" android:padding="12dp"/>
+
+        <Button android:id="@+id/btnSaveProfile"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:text="@string/save"/>
+    </LinearLayout>
+</ScrollView>
+
