@@ -1,6 +1,5 @@
 package com.example.betabuddy.login
 
-import androidx.fragment.app.Fragment
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
 import com.example.betabuddy.home.HomeFragment
@@ -10,8 +9,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
 
 
 class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){

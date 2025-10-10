@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
+import android.widget.Button
+import com.example.betabuddy.find.FindFriendsFragment
 
 class RequestsFragment : BaseLoggingFragment(R.layout.fragment_requests) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -13,6 +15,14 @@ class RequestsFragment : BaseLoggingFragment(R.layout.fragment_requests) {
         val rv = view.findViewById<RecyclerView>(R.id.rvRequests)
         rv.layoutManager = LinearLayoutManager(requireContext())
         rv.adapter = RequestsAdapter(listOf("Alex", "Priya")) // mock
+
+        // Back button
+        view.findViewById<Button>(R.id.btnBack).setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container_view, FindFriendsFragment())
+                .addToBackStack(null)
+                .commit()
+        }
     }
 }
 

@@ -1,37 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="24dp"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
+    <!-- Location Filter -->
     <EditText
         android:id="@+id/etFilterLocation"
-        android:layout_width="match_parent" android:layout_height="56dp"
-        android:hint="@string/filter_by_location" android:padding="12dp"/>
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="@string/filter_by_location"
+        android:padding="12dp" />
 
+    <!-- Search / Pending / Friends Buttons -->
     <LinearLayout
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="horizontal" android:layout_marginTop="8dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
         <Button
             android:id="@+id/btnSearch"
-            android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:text="@string/search"/>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/search" />
+
         <Button
             android:id="@+id/btnPending"
-            android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:layout_marginStart="8dp"
-            android:text="@string/pending_requests"/>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/pending_requests" />
+
         <Button
             android:id="@+id/btnViewFriends"
-            android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:layout_marginStart="8dp"
-            android:text="@string/view_friends"/>
-
-        <include layout="@layout/include_home_button" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/view_friends" />
     </LinearLayout>
 
+    <!-- Search Results List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvResults"
-        android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:layout_marginTop="12dp"/>
-</LinearLayout>
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp" />
 
+    <!-- Global Home Button -->
+    <include layout="@layout/include_home_button" />
+
+</LinearLayout>
