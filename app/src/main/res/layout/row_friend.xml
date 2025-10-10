@@ -1,5 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tvFriendName"
-    android:padding="16dp" android:textSize="16sp"
-    android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="56dp"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/tvFriendName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize= "20sp" />
+
+    <ImageButton
+        android:id="@+id/btnRowChat"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="@string/chat_title"
+        android:padding="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_send"
+        app:tint="@color/purple_500" />
+
+</LinearLayout>
+

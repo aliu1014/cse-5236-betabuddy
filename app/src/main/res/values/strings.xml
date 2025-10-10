@@ -59,6 +59,11 @@
     <string name="deny">Deny</string>
     <string name="no_requests">No pending friend requests.</string>
 
+    <!-- Chat Messages -->
+    <string name="chat_title">Chat</string>
+    <string name="button_send">Send</string>
+    <string name="hint_type_message">Type a message...</string>
+
     <!-- General UI -->
     <string name="back">Back</string>
     <string name="cancel">Cancel</string>

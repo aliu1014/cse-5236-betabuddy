@@ -113,7 +113,7 @@ private class TextRowVH(
     fun bind(text: String) {
         itemView.findViewById<android.widget.TextView>(R.id.tvName).text = text
         itemView.findViewById<android.widget.TextView>(R.id.tvLocation).text = ""
-        itemView.findViewById<android.widget.Button>(R.id.btnViewInfo).setOnClickListener { onViewInfo() }
+//        itemView.findViewById<android.widget.Button>(R.id.btnViewInfo).setOnClickListener { onViewInfo() }
         itemView.findViewById<android.widget.Button>(R.id.btnRequest).setOnClickListener { onSendRequest() }
     }
 }

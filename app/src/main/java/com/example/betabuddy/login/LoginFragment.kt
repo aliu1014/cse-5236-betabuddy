@@ -10,7 +10,16 @@ import android.widget.EditText
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 
-
+/**
+ * Login Fragment
+ * --------------
+ * This fragment provides the login screen, where the user will log in or sign up
+ * The UI Contains:
+ * -A text box for email
+ * -A text box for password
+ * -A button to log in
+ * -A button to sign up
+ */
 class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
     private lateinit var auth: FirebaseAuth
 
@@ -20,7 +29,7 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
-        // Connect UI elements
+        // Connect UI elements from xml
         val usernameInput = view.findViewById<EditText>(R.id.etEmail)
         val passwordInput = view.findViewById<EditText>(R.id.etPassword)
         val loginButton = view.findViewById<Button>(R.id.btnLogin)
@@ -32,6 +41,7 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
                 val email = usernameInput.text.toString().trim()
                 val password = passwordInput.text.toString().trim()
 
+                // Validate input before attempting sign-in
                 if (email.isEmpty() || password.isEmpty()) {
                     Toast.makeText(requireContext(), "Please enter both email and password", Toast.LENGTH_SHORT).show()
                     return@setOnEditorActionListener true
@@ -41,6 +51,7 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
+                            //Navigate to home screen on successful login
                             Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                             parentFragmentManager.beginTransaction()
                                 .replace(R.id.fragment_container_view, HomeFragment())
@@ -75,16 +86,18 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
                 Toast.makeText(requireContext(), "Please enter both email and password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
+            //Attempt to sign in with Firebase
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        //Navigate to home screen upon success
                         Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
                         parentFragmentManager.beginTransaction()
                             .replace(R.id.fragment_container_view, HomeFragment())
                             .addToBackStack(null)
                             .commit()
                     } else {
+                        //Handle sign in errors
                         val message = task.exception?.message ?: "Login failed"
                         when {
                             message.contains("no user record", ignoreCase = true) ->
@@ -110,11 +123,12 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
                 return@setOnClickListener
             }
 
+            //Create new account in Firebase Authentication
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Toast.makeText(requireContext(), "Account created successfully!", Toast.LENGTH_SHORT).show()
-                        // Optional: navigate to HomeFragment after successful signup
+                        //Inform user and navigate to home
                         parentFragmentManager.beginTransaction()
                             .replace(R.id.fragment_container_view, HomeFragment())
                             .addToBackStack(null)

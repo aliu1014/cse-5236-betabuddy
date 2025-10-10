@@ -8,6 +8,18 @@ import android.widget.Toast
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
 
+
+/**
+ * Profile Fragment
+ * ----------------
+ * This fragment allows the suer to view their profile and make any edits
+ * The UI Contains:
+ * -A text box for name
+ * -A text box for location
+ * -A text box for skill level
+ * -A button to save all the data
+ * -A button to navigate back to the homepage
+ */
 class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -6,6 +6,7 @@ import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.betabuddy.R
+import com.example.betabuddy.chat.ChatFragment
 import com.example.betabuddy.core.BaseLoggingFragment
 import com.example.betabuddy.find.FindFriendsFragment
 
@@ -18,11 +19,24 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
     // Called immediately after the fragment's view has been created. Initialize the RecyclerView with a layout manager and an adapter.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val rv = view.findViewById<RecyclerView>(R.id.rvFriends)
 
         //Display items in vertical list
         rv.layoutManager = LinearLayoutManager(requireContext())
-        rv.adapter = SimpleTextAdapter(listOf("User #1", "User #2", "User #3"))
+        //rv.adapter = SimpleTextAdapter(listOf("User #1", "User #2", "User #3"))
+        rv.adapter = FriendsAdapter(listOf("User #1", "User #2", "User #3")) { friendName ->
+            // Navigate to ChatFragment with the selected friend
+            val chat = ChatFragment().apply {
+                arguments = android.os.Bundle().apply {
+                    putString("chatPartnerName", friendName)
+                }
+            }
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container_view, chat)
+                .addToBackStack(null)
+                .commit()
+        }
 
         // Check if coming from FindFriendsFragment
         val fromFindFriends = arguments?.getBoolean("fromFindFriends", false) ?: false
@@ -51,6 +65,34 @@ private class SimpleTextAdapter(private val items: List<String>) :
     }
     override fun onBindViewHolder(h: TextVH, i: Int) = h.bind(items[i])
     override fun getItemCount() = items.size
+}
+
+private class FriendsAdapter(
+    private val items: List<String>,
+    private val onChatClick: (String) -> Unit
+) : RecyclerView.Adapter<FriendVH>() {
+
+    override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): FriendVH {
+        val v = android.view.LayoutInflater.from(parent.context)
+            .inflate(R.layout.row_friend, parent, false)
+        return FriendVH(v, onChatClick)
+    }
+    override fun onBindViewHolder(holder: FriendVH, position: Int) {
+        holder.bind(items[position])
+    }
+    override fun getItemCount(): Int = items.size
+}
+private class FriendVH(
+    itemView: android.view.View,
+    private val onChatClick: (String) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
+    private val nameView = itemView.findViewById<android.widget.TextView>(R.id.tvFriendName)
+    private val chatBtn  = itemView.findViewById<android.widget.ImageButton>(R.id.btnRowChat)
+    fun bind(friendName: String) {
+        nameView.text = friendName
+        chatBtn.setOnClickListener { onChatClick(friendName) }
+
+    }
 }
 
 // Represents one row or item in RV. Each row shows name of one friend using a TextView
