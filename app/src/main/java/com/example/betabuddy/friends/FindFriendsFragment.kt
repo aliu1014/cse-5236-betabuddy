@@ -62,11 +62,18 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
 
         // Navigate to FriendsFragment when "View Friends" is clicked
         view.findViewById<Button>(R.id.btnViewFriends).setOnClickListener {
+            val fragment = FriendsFragment()
+            val args = Bundle().apply {
+                putBoolean("fromFindFriends", true)
+            }
+            fragment.arguments = args
+
             parentFragmentManager.commit {
-                replace(R.id.fragment_container_view, FriendsFragment())
+                replace(R.id.fragment_container_view, fragment)
                 addToBackStack(null)
             }
         }
+
     }
 }
 
@@ -95,7 +102,7 @@ private class SimpleResultsAdapter(
     override fun getItemCount() = data.size
 }
 
-// Represents one row (one search result) in the RV where each row has name, location, and buttons for "ViewInfo" nad "Send Request"
+// Represents one row (one search result) in the RV where each row has name, location, and buttons for "ViewInfo" and "Send Request"
 private class TextRowVH(
     itemView: android.view.View,
     val onViewInfo: () -> Unit,

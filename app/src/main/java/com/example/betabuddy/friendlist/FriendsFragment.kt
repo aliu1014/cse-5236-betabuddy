@@ -2,10 +2,12 @@ package com.example.betabuddy.friendlist
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
+import com.example.betabuddy.find.FindFriendsFragment
 
 /**
  * This fragment displays a simple list of friends using a RecyclerView.
@@ -21,6 +23,21 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
         //Display items in vertical list
         rv.layoutManager = LinearLayoutManager(requireContext())
         rv.adapter = SimpleTextAdapter(listOf("User #1", "User #2", "User #3"))
+
+        // Check if coming from FindFriendsFragment
+        val fromFindFriends = arguments?.getBoolean("fromFindFriends", false) ?: false
+        val backButton = view.findViewById<Button>(R.id.btnBack)
+
+        if (fromFindFriends) {
+            // Show Back button and set its action
+            backButton.visibility = View.VISIBLE
+            backButton.setOnClickListener {
+                parentFragmentManager.popBackStack()
+            }
+        } else {
+            // Hide the Back button if not coming from FindFriendsFragment
+            backButton.visibility = View.GONE
+        }
     }
 }
 
