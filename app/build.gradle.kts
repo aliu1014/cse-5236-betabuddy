@@ -78,4 +78,6 @@ dependencies {
     // Firebase SDKs you need
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.5")
 }
