@@ -1,5 +1,6 @@
 package com.example.betabuddy.profile
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.firestore.ktx.toObject
@@ -14,8 +15,8 @@ class ProfileRepository {
 
     // Create or update user profile
     fun saveUser(user: User, onResult: (Boolean) -> Unit) {
-        db.collection("users")
-            .document(user.username)
+        val email = FirebaseAuth.getInstance().currentUser?.email ?: return
+        db.collection("users").document(email)
             .set(user)
             .addOnSuccessListener { onResult(true) }
             .addOnFailureListener { onResult(false) }
@@ -23,24 +24,27 @@ class ProfileRepository {
 
     // Get user profile by username
     fun getUser(username: String, onResult: (User?) -> Unit) {
-        db.collection("users")
-            .document(username)
+        val email = FirebaseAuth.getInstance().currentUser?.email ?: return
+        db.collection("users").document(email)
             .get()
             .addOnSuccessListener { snapshot ->
-                val user = snapshot.toObject<User>()
+                val user = snapshot.toObject(User::class.java)
                 onResult(user)
             }
-            .addOnFailureListener {
-                onResult(null)
-            }
+            .addOnFailureListener { onResult(null) }
     }
 
     // Delete user profile
     fun deleteUser(username: String, onResult: (Boolean) -> Unit) {
-        db.collection("users")
-            .document(username)
-            .delete()
-            .addOnSuccessListener { onResult(true) }
+        val auth = FirebaseAuth.getInstance()
+        val email = auth.currentUser?.email ?: return
+
+        db.collection("users").document(email).delete()
+            .addOnSuccessListener {
+                auth.currentUser?.delete()
+                    ?.addOnSuccessListener { onResult(true) }
+                    ?.addOnFailureListener { onResult(false) }
+            }
             .addOnFailureListener { onResult(false) }
     }
 

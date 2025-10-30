@@ -1,5 +1,6 @@
 package com.example.betabuddy.profile
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -159,6 +160,44 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                     }
                 }
             }
+        }
+
+        // --- Delete Profile Button ---
+        val btnDelete = view.findViewById<Button>(R.id.btnDeleteProfile)
+
+        btnDelete.setOnClickListener {
+            val username = view.findViewById<EditText>(R.id.etUsername).text.toString().trim()
+
+            if (username.isEmpty()) {
+                Toast.makeText(requireContext(), "No username to delete.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Ask user to confirm deletion
+            AlertDialog.Builder(requireContext())
+                .setTitle("Delete Profile")
+                .setMessage("Are you sure you want to delete your profile? This action cannot be undone.")
+                .setPositiveButton("Yes") { _, _ ->
+                    // Call ViewModel delete function
+                    viewModel.deleteUser(username) { ok ->
+                        if (ok) {
+                            Toast.makeText(requireContext(), "Profile deleted", Toast.LENGTH_SHORT).show()
+
+                            // Clear back stack and reload LoginFragment
+                            parentFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                            parentFragmentManager.beginTransaction()
+                                .replace(
+                                    R.id.fragment_container_view,
+                                    com.example.betabuddy.login.LoginFragment()
+                                )
+                                .commit()
+                        } else {
+                            Toast.makeText(requireContext(), "Failed to delete profile", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
 
         // Auto-load user if username already entered
