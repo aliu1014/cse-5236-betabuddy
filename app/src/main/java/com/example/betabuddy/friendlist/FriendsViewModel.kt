@@ -1,41 +1,40 @@
 package com.example.betabuddy.friendlist
 
-import androidx.lifecycle.*
-import com.example.betabuddy.data.FriendsRepository
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.map
 import com.example.betabuddy.model.UserProfile
 import kotlinx.coroutines.launch
 
 /**
- * FriendsViewModel
- * ----------------
  * Manages the list of the user's friends.
- * Observes Firestore (or another data source) via FriendsRepository.
+ * Observes Firestore via FriendsRepository.
  */
 class FriendsViewModel(
-    private val repo: FriendsRepository
+    private val repo: FriendsRepository = FriendsRepository()
 ) : ViewModel() {
 
-    /** Live observable list of the user's friends */
+    // Live list of friends from Firestore
     val friends: LiveData<List<UserProfile>> = repo.friends
 
-    /** Simple string-mapped version for your current adapter */
-    val friendNames: LiveData<List<String>> = Transformations.map(friends) { list ->
+    // Simple list of friend names for easy RecyclerView display (modern LiveData.map)
+    val friendNames: LiveData<List<String>> = friends.map { list ->
         list.map { it.name.ifBlank { "Unknown Friend" } }
     }
 
-    /** Loads the current user's friends from Firestore */
-    fun loadFriends(currentUid: String) = viewModelScope.launch {
-        repo.loadFriends(currentUid)
+    // Load all friends for the current logged-in user
+    fun loadFriends() = viewModelScope.launch {
+        repo.loadFriends { /* handle result if needed */ }
     }
-}
 
-/** Factory so your fragment can get the ViewModel with a repository dependency */
-class FriendsVMFactory(
-    private val repo: FriendsRepository
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        require(modelClass.isAssignableFrom(FriendsViewModel::class.java))
-        return FriendsViewModel(repo) as T
+    // Add a friend to the current user's list
+    fun addFriend(friend: UserProfile) = viewModelScope.launch {
+        repo.addFriend(friend) { /* handle result if needed */ }
+    }
+
+    // Remove a friend by email
+    fun removeFriend(email: String) = viewModelScope.launch {
+        repo.removeFriend(email) { /* handle result if needed */ }
     }
 }

@@ -3,70 +3,73 @@ package com.example.betabuddy.friendlist
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.betabuddy.R
 import com.example.betabuddy.chat.ChatFragment
 import com.example.betabuddy.core.BaseLoggingFragment
-import com.example.betabuddy.find.FindFriendsFragment
 
 /**
- * This fragment displays a simple list of friends using a RecyclerView.
- * It extends BaseLoggingFragment to automatically log lifecycle events
- * and include the Home button functionality.
+ * Displays a live list of friends from Firestore using FriendsViewModel.
+ * Each friend can be tapped to open a chat.
  */
 class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
-    // Called immediately after the fragment's view has been created. Initialize the RecyclerView with a layout manager and an adapter.
+
+    private val viewModel: FriendsViewModel by viewModels()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val rv = view.findViewById<RecyclerView>(R.id.rvFriends)
-
-        //Display items in vertical list
-        rv.layoutManager = LinearLayoutManager(requireContext())
-        //rv.adapter = SimpleTextAdapter(listOf("User #1", "User #2", "User #3"))
-        rv.adapter = FriendsAdapter(listOf("User #1", "User #2", "User #3")) { friendName ->
-            // Navigate to ChatFragment with the selected friend
-            val chat = ChatFragment().apply {
-                arguments = android.os.Bundle().apply {
-                    putString("chatPartnerName", friendName)
-                }
-            }
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container_view, chat)
-                .addToBackStack(null)
-                .commit()
-        }
-
-        // Check if coming from FindFriendsFragment
-        val fromFindFriends = arguments?.getBoolean("fromFindFriends", false) ?: false
         val backButton = view.findViewById<Button>(R.id.btnBack)
 
+        // Set up RecyclerView
+        rv.layoutManager = LinearLayoutManager(requireContext())
+
+        // Observe LiveData from ViewModel and update RecyclerView dynamically
+        viewModel.friendNames.observe(viewLifecycleOwner) { friendNames ->
+            rv.adapter = FriendsAdapter(friendNames) { friendName ->
+                // Navigate to ChatFragment when a friend is tapped
+                val chat = ChatFragment().apply {
+                    arguments = Bundle().apply {
+                        putString("chatPartnerName", friendName)
+                    }
+                }
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container_view, chat)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+
+        // Load friends from Firestore
+        viewModel.loadFriends()
+
+        // Handle "from FindFriends" navigation
+        val fromFindFriends = arguments?.getBoolean("fromFindFriends", false) ?: false
         if (fromFindFriends) {
-            // Show Back button and set its action
             backButton.visibility = View.VISIBLE
             backButton.setOnClickListener {
                 parentFragmentManager.popBackStack()
             }
         } else {
-            // Hide the Back button if not coming from FindFriendsFragment
             backButton.visibility = View.GONE
+        }
+
+        // Optional toast confirmation
+        viewModel.friends.observe(viewLifecycleOwner) { list ->
+            if (list.isEmpty()) {
+                Toast.makeText(requireContext(), "No friends yet. Add some!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
 
-// Display lists of strings where each is bound to a TextView inside a row layout
-private class SimpleTextAdapter(private val items: List<String>) :
-    RecyclerView.Adapter<TextVH>() {
-    override fun onCreateViewHolder(p: android.view.ViewGroup, v: Int): TextVH {
-        val v = android.view.LayoutInflater.from(p.context)
-            .inflate(R.layout.row_friend, p, false)
-        return TextVH(v)
-    }
-    override fun onBindViewHolder(h: TextVH, i: Int) = h.bind(items[i])
-    override fun getItemCount() = items.size
-}
-
+/**
+ * Adapter for showing friend names and chat buttons in RecyclerView.
+ */
 private class FriendsAdapter(
     private val items: List<String>,
     private val onChatClick: (String) -> Unit
@@ -77,27 +80,26 @@ private class FriendsAdapter(
             .inflate(R.layout.row_friend, parent, false)
         return FriendVH(v, onChatClick)
     }
+
     override fun onBindViewHolder(holder: FriendVH, position: Int) {
         holder.bind(items[position])
     }
+
     override fun getItemCount(): Int = items.size
 }
+
+/**
+ * ViewHolder for a single friend row (name + chat button)
+ */
 private class FriendVH(
     itemView: android.view.View,
     private val onChatClick: (String) -> Unit
 ) : RecyclerView.ViewHolder(itemView) {
     private val nameView = itemView.findViewById<android.widget.TextView>(R.id.tvFriendName)
-    private val chatBtn  = itemView.findViewById<android.widget.ImageButton>(R.id.btnRowChat)
+    private val chatBtn = itemView.findViewById<android.widget.ImageButton>(R.id.btnRowChat)
+
     fun bind(friendName: String) {
         nameView.text = friendName
         chatBtn.setOnClickListener { onChatClick(friendName) }
-
-    }
-}
-
-// Represents one row or item in RV. Each row shows name of one friend using a TextView
-private class TextVH(item: android.view.View) : RecyclerView.ViewHolder(item) {
-    fun bind(text: String) {
-        itemView.findViewById<android.widget.TextView>(R.id.tvFriendName).text = text
     }
 }
