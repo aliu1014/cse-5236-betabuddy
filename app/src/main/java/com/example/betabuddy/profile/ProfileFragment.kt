@@ -9,7 +9,6 @@ import com.example.betabuddy.core.BaseLoggingFragment
 import android.graphics.Color
 import android.view.ViewGroup
 
-
 /**
  * Displays and edits the full climbing profile for the current user.
  * Uses Firestore via ViewModel + Repository for persistence.
