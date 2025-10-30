@@ -76,8 +76,19 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 
     // Firebase SDKs you need
+<<<<<<< HEAD
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
 
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.5")
+=======
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
+
+>>>>>>> c7a8b56 (Linke database and save profile details to database)
 }

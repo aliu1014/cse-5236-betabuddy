@@ -16,28 +16,131 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!-- Unique identifier -->
+            <EditText
+                android:id="@+id/etUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Username"
+                android:inputType="textPersonName" />
+
+            <!-- Basic information -->
             <EditText
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:hint="@string/name"
-                android:padding="12dp" />
+                android:layout_height="wrap_content"
+                android:hint="Full Name"
+                android:inputType="textPersonName" />
+
+            <Spinner
+                android:id="@+id/spGender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:padding="8dp"
+                android:background="@drawable/spinner_outline"
+                android:spinnerMode="dropdown" />
+
 
             <EditText
-                android:id="@+id/etLocation"
+                android:id="@+id/etAge"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
+                android:hint="Age"
+                android:inputType="number" />
+
+            <!-- Height: feet + inches side by side -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Height"
                 android:layout_marginTop="8dp"
-                android:hint="@string/location"
-                android:padding="12dp" />
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="2"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/etHeightFeet"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Feet"
+                    android:inputType="number"
+                    android:imeOptions="actionNext"
+                    android:paddingEnd="8dp" />
+
+                <EditText
+                    android:id="@+id/etHeightInches"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Inches"
+                    android:inputType="number"
+                    android:imeOptions="actionDone" />
+            </LinearLayout>
 
             <EditText
-                android:id="@+id/etSkill"
+                android:id="@+id/etWeight"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
+                android:hint="Weight (lbs)"
+                android:inputType="number" />
+
+            <!-- Climbing grades -->
+            <Spinner
+                android:id="@+id/spGradeTopRope"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="@string/skill_level"
-                android:padding="12dp" />
+                android:layout_marginBottom="8dp"
+                android:padding="8dp"
+                android:background="@drawable/spinner_outline"
+                android:spinnerMode="dropdown" />
+
+            <Spinner
+                android:id="@+id/spGradeBoulder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:padding="8dp"
+                android:background="@drawable/spinner_outline"
+                android:spinnerMode="dropdown" />
+
+            <Spinner
+                android:id="@+id/spGradeLead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:padding="8dp"
+                android:background="@drawable/spinner_outline"
+                android:spinnerMode="dropdown" />
+
+            <!-- Gear and certifications -->
+            <CheckBox
+                android:id="@+id/cbHasGear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Has Climbing Gear" />
+
+            <CheckBox
+                android:id="@+id/cbTopRopeCert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Top Rope Certified" />
+
+            <CheckBox
+                android:id="@+id/cbLeadCert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lead Certified" />
 
             <Button
                 android:id="@+id/btnSaveProfile"

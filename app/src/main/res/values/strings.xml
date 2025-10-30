@@ -70,4 +70,51 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="home_button_text">Home</string>
+
+    <!-- Profile Options -->
+    <string-array name="gender_options">
+        <item>Select Gender</item>
+        <item>Male</item>
+        <item>Female</item>
+        <item>Prefer not to say</item>
+    </string-array>
+
+    <string-array name="toprope_grades">
+        <item>Select Top Rope Grade</item>
+        <item>5.6</item>
+        <item>5.7</item>
+        <item>5.8</item>
+        <item>5.9</item>
+        <item>5.10</item>
+        <item>5.11</item>
+        <item>5.12</item>
+        <item>5.13+</item>
+    </string-array>
+
+    <string-array name="lead_grades">
+        <item>Select Lead Grade</item>
+        <item>5.6</item>
+        <item>5.7</item>
+        <item>5.8</item>
+        <item>5.9</item>
+        <item>5.10</item>
+        <item>5.11</item>
+        <item>5.12</item>
+        <item>5.13+</item>
+    </string-array>
+
+    <string-array name="boulder_grades">
+        <item>Select Boulder Grade</item>
+        <item>V0</item>
+        <item>V1</item>
+        <item>V2</item>
+        <item>V3</item>
+        <item>V4</item>
+        <item>V5</item>
+        <item>V6</item>
+        <item>V7</item>
+        <item>V8</item>
+        <item>V9</item>
+        <item>V10+</item>
+    </string-array>
 </resources>
