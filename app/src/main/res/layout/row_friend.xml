@@ -28,5 +28,18 @@
         android:src="@android:drawable/ic_menu_send"
         app:tint="@color/purple_500" />
 
+    <!-- Delete / Remove button -->
+    <Button
+        android:id="@+id/btnRowRemove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remove"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#E53935"
+        android:layout_marginStart="8dp"
+        android:minHeight="36dp"
+        android:paddingHorizontal="12dp" />
+
 </LinearLayout>
 

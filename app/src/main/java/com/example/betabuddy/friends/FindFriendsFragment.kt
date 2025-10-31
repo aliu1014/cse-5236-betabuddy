@@ -1,17 +1,21 @@
-package com.example.betabuddy.find
+package com.example.betabuddy.friends
 
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.commit
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
 import com.example.betabuddy.friendlist.FriendsFragment
 import com.example.betabuddy.profile.ProfileFragment
-import com.example.betabuddy.requests.RequestsFragment
+import com.example.betabuddy.request.RequestsFragment
+import kotlin.getValue
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 /**
  * FindFriendsFragment
@@ -23,36 +27,52 @@ import com.example.betabuddy.requests.RequestsFragment
  *  - A RecyclerView showing mock search results
  */
 class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) {
+    private val viewModel: FindFriendsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Get reference to the location filter input
         val et = view.findViewById<EditText>(R.id.etFilterLocation)
         val rv = view.findViewById<RecyclerView>(R.id.rvResults)
         rv.layoutManager = LinearLayoutManager(requireContext())
-        rv.adapter = SimpleResultsAdapter(
-            onViewInfo = {
+
+        val adapter = SimpleResultsAdapter(
+            onViewInfo = { pos ->
+                // get the selected hit (email + User)
+                val hit = viewModel.hits.value?.getOrNull(pos) ?: return@SimpleResultsAdapter
                 parentFragmentManager.commit {
-                    replace(R.id.fragment_container_view, ProfileFragment()) // detail screen later
+                    replace(
+                        R.id.fragment_container_view,
+                        ProfileFragment().apply {
+                            arguments = Bundle().apply {
+                                // pass the doc id (email) to your profile screen
+                                putString("email", hit.email)
+                            }
+                        }
+                    )
                     addToBackStack(null)
                 }
             },
-            onSendRequest = { /* no-op placeholder for now */ }
+            onSendRequest = { pos ->
+                val hit = viewModel.hits.value?.getOrNull(pos) ?: return@SimpleResultsAdapter
+                // send to recipient's email (doc id)
+                viewModel.sendRequest(hit.email)
+                // the repo removes this row from the list on success
+            }
         )
+        rv.adapter = adapter
 
-        view.findViewById<Button>(R.id.btnSearch).setOnClickListener {
-            // For now we just populate mock rows
-            (rv.adapter as SimpleResultsAdapter).submit(
-                listOf(
-                    "Alex (Lead 5.10b) — ${et.text.ifBlank { "Anywhere" }}",
-                    "Priya (Top rope 5.9) — ${et.text.ifBlank { "Anywhere" }}",
-                    "Sam (Boulder V4) — ${et.text.ifBlank { "Anywhere" }}"
-                )
-            )
+        // Observe pretty strings to render the rows
+        viewModel.resultRows.observe(viewLifecycleOwner) { rows ->
+            adapter.submit(rows)
         }
 
-        // Navigate to RequestsFragment when "Pending Requests" is clicked
+        // Search button -> triggers Firestore query
+        view.findViewById<Button>(R.id.btnSearch).setOnClickListener {
+            viewModel.search(et.text?.toString())
+        }
+
+        // Pending Requests -> just navigate (listener runs inside RequestsFragment)
         view.findViewById<Button>(R.id.btnPending).setOnClickListener {
             parentFragmentManager.commit {
                 replace(R.id.fragment_container_view, RequestsFragment())
@@ -60,61 +80,63 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
             }
         }
 
-        // Navigate to FriendsFragment when "View Friends" is clicked
+        // Friends list
         view.findViewById<Button>(R.id.btnViewFriends).setOnClickListener {
-            val fragment = FriendsFragment()
-            val args = Bundle().apply {
-                putBoolean("fromFindFriends", true)
-            }
-            fragment.arguments = args
-
             parentFragmentManager.commit {
-                replace(R.id.fragment_container_view, fragment)
+                replace(R.id.fragment_container_view, FriendsFragment())
                 addToBackStack(null)
             }
         }
 
+        // Initial load: show everyone
+        if (savedInstanceState == null) viewModel.search(null)
     }
 }
 
-/** Minimal adapter for mock results (no Firebase). */
+/** Adapter that returns the clicked row position */
 private class SimpleResultsAdapter(
-    val onViewInfo: () -> Unit,
-    val onSendRequest: () -> Unit
+    val onViewInfo: (Int) -> Unit,
+    val onSendRequest: (Int) -> Unit
 ) : RecyclerView.Adapter<TextRowVH>() {
 
-    // Internal list of data items (friend search results)
     private val data = mutableListOf<String>()
 
-    // Replaces current list items and refreshes the RV
+    fun submit(items: List<String>) {
+        data.clear()
+        data.addAll(items)
+        notifyDataSetChanged()
+    }
 
-    fun submit(items: List<String>) { data.clear(); data.addAll(items); notifyDataSetChanged() }
-
-    // Inflates the row layout for each search result
-    override fun onCreateViewHolder(p: android.view.ViewGroup, vType: Int): TextRowVH {
-        val v = android.view.LayoutInflater.from(p.context)
-            .inflate(R.layout.row_find_result, p, false)
+    override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): TextRowVH {
+        val v = android.view.LayoutInflater.from(parent.context)
+            .inflate(R.layout.row_find_result, parent, false)
         return TextRowVH(v, onViewInfo, onSendRequest)
     }
 
-    // Binds each search result (text) to a row
-    override fun onBindViewHolder(h: TextRowVH, pos: Int) = h.bind(data[pos])
+    override fun onBindViewHolder(holder: TextRowVH, position: Int) =
+        holder.bind(data[position], position)
+
     override fun getItemCount() = data.size
 }
 
-// Represents one row (one search result) in the RV where each row has name, location, and buttons for "ViewInfo" and "Send Request"
 private class TextRowVH(
     itemView: android.view.View,
-    val onViewInfo: () -> Unit,
-    val onSendRequest: () -> Unit
+    val onViewInfo: (Int) -> Unit,
+    val onSendRequest: (Int) -> Unit
 ) : RecyclerView.ViewHolder(itemView) {
 
-    // Binds the text data and attaches click listeners for each row
-    fun bind(text: String) {
+    fun bind(text: String, pos: Int) {
         itemView.findViewById<android.widget.TextView>(R.id.tvName).text = text
         itemView.findViewById<android.widget.TextView>(R.id.tvLocation).text = ""
-//        itemView.findViewById<android.widget.Button>(R.id.btnViewInfo).setOnClickListener { onViewInfo() }
-        itemView.findViewById<android.widget.Button>(R.id.btnRequest).setOnClickListener { onSendRequest() }
+
+        // If you later add a dedicated "View Info" button, wire it here:
+        val viewInfoId = itemView.resources.getIdentifier("btnViewInfo", "id", itemView.context.packageName)
+        if (viewInfoId != 0) {
+            itemView.findViewById<android.widget.Button>(viewInfoId)?.setOnClickListener { onViewInfo(pos) }
+        }
+
+        itemView.findViewById<android.widget.Button>(R.id.btnRequest)
+            .setOnClickListener { onSendRequest(pos) }
     }
 }
 

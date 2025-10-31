@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.fragment.app.commit
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
-import com.example.betabuddy.find.FindFriendsFragment
+import com.example.betabuddy.friends.FindFriendsFragment
 import com.example.betabuddy.friendlist.FriendsFragment
 import com.example.betabuddy.login.LoginFragment
 import com.example.betabuddy.profile.ProfileFragment

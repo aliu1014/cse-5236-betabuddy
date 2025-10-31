@@ -1,9 +1,9 @@
 package com.example.betabuddy.model
 
 data class FriendRequest(
-    val requestId: String = "",
-    val fromUserId: String = "",
-    val toUserId: String = "",
-    val timestamp: Long = System.currentTimeMillis(),
-    val status: String = "pending"  // "pending", "accepted", "declined"
+    val senderEmail: String = "",
+    val senderName: String = "",
+    val recipientEmail: String = "",
+    val message: String = "",
+    val createdAt: Long = System.currentTimeMillis()
 )

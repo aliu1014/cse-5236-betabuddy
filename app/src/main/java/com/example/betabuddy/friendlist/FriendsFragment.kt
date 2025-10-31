@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.betabuddy.R
 import com.example.betabuddy.chat.ChatFragment
 import com.example.betabuddy.core.BaseLoggingFragment
+import com.example.betabuddy.model.UserProfile
 
 /**
  * Displays a live list of friends from Firestore using FriendsViewModel.
- * Each friend can be tapped to open a chat.
+ * Each friend can be tapped to open a chat or removed.
  */
 class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
 
@@ -25,81 +26,90 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
         val rv = view.findViewById<RecyclerView>(R.id.rvFriends)
         val backButton = view.findViewById<Button>(R.id.btnBack)
 
-        // Set up RecyclerView
         rv.layoutManager = LinearLayoutManager(requireContext())
 
-        // Observe LiveData from ViewModel and update RecyclerView dynamically
-        viewModel.friendNames.observe(viewLifecycleOwner) { friendNames ->
-            rv.adapter = FriendsAdapter(friendNames) { friendName ->
-                // Navigate to ChatFragment when a friend is tapped
+        // Adapter handles both chat + remove
+        val adapter = FriendsAdapter(
+            onChatClick = { friend ->
                 val chat = ChatFragment().apply {
                     arguments = Bundle().apply {
-                        putString("chatPartnerName", friendName)
+                        putString("chatPartnerName", friend.name.ifBlank { friend.email })
                     }
                 }
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container_view, chat)
                     .addToBackStack(null)
                     .commit()
+            },
+            onRemoveClick = { friend ->
+                viewModel.removeFriend(friend.email)
+                Toast.makeText(requireContext(), "Removed ${friend.name}", Toast.LENGTH_SHORT).show()
+                viewModel.loadFriends()
             }
-        }
+        )
+        rv.adapter = adapter
 
-        // Load friends from Firestore
-        viewModel.loadFriends()
-
-        // Handle "from FindFriends" navigation
-        val fromFindFriends = arguments?.getBoolean("fromFindFriends", false) ?: false
-        if (fromFindFriends) {
-            backButton.visibility = View.VISIBLE
-            backButton.setOnClickListener {
-                parentFragmentManager.popBackStack()
-            }
-        } else {
-            backButton.visibility = View.GONE
-        }
-
-        // Optional toast confirmation
+        // Observe full list of friends (UserProfile)
         viewModel.friends.observe(viewLifecycleOwner) { list ->
+            adapter.submit(list)
             if (list.isEmpty()) {
                 Toast.makeText(requireContext(), "No friends yet. Add some!", Toast.LENGTH_SHORT).show()
             }
         }
+
+        viewModel.loadFriends()
+
+        val fromFindFriends = arguments?.getBoolean("fromFindFriends", false) ?: false
+        backButton.visibility = if (fromFindFriends) View.VISIBLE else View.GONE
+        backButton.setOnClickListener { parentFragmentManager.popBackStack() }
     }
 }
 
 /**
- * Adapter for showing friend names and chat buttons in RecyclerView.
+ * Adapter for showing friends with chat and remove buttons.
  */
 private class FriendsAdapter(
-    private val items: List<String>,
-    private val onChatClick: (String) -> Unit
+    private val onChatClick: (UserProfile) -> Unit,
+    private val onRemoveClick: (UserProfile) -> Unit
 ) : RecyclerView.Adapter<FriendVH>() {
+
+    private val data = mutableListOf<UserProfile>()
+
+    fun submit(items: List<UserProfile>) {
+        data.clear()
+        data.addAll(items)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): FriendVH {
         val v = android.view.LayoutInflater.from(parent.context)
             .inflate(R.layout.row_friend, parent, false)
-        return FriendVH(v, onChatClick)
+        return FriendVH(v, onChatClick, onRemoveClick)
     }
 
     override fun onBindViewHolder(holder: FriendVH, position: Int) {
-        holder.bind(items[position])
+        holder.bind(data[position])
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = data.size
 }
 
 /**
- * ViewHolder for a single friend row (name + chat button)
+ * ViewHolder for a single friend row (name + chat + remove button)
  */
 private class FriendVH(
     itemView: android.view.View,
-    private val onChatClick: (String) -> Unit
+    private val onChatClick: (UserProfile) -> Unit,
+    private val onRemoveClick: (UserProfile) -> Unit
 ) : RecyclerView.ViewHolder(itemView) {
+
     private val nameView = itemView.findViewById<android.widget.TextView>(R.id.tvFriendName)
     private val chatBtn = itemView.findViewById<android.widget.ImageButton>(R.id.btnRowChat)
+    private val removeBtn = itemView.findViewById<android.widget.Button>(R.id.btnRowRemove)
 
-    fun bind(friendName: String) {
-        nameView.text = friendName
-        chatBtn.setOnClickListener { onChatClick(friendName) }
+    fun bind(friend: UserProfile) {
+        nameView.text = friend.name.ifBlank { friend.email }
+        chatBtn.setOnClickListener { onChatClick(friend) }
+        removeBtn.setOnClickListener { onRemoveClick(friend) }
     }
 }
