@@ -146,7 +146,7 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 if (exists) {
                     Toast.makeText(
                         requireContext(),
-                        "⚠Username already taken!",
+                        "Username already taken!",
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
