@@ -23,7 +23,7 @@ class ProfileRepository {
     }
 
     // Get user profile by username
-    fun getUser(username: String, onResult: (User?) -> Unit) {
+    fun getUser(onResult: (User?) -> Unit) {
         val email = FirebaseAuth.getInstance().currentUser?.email ?: return
         db.collection("users").document(email)
             .get()

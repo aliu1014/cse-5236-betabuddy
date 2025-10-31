@@ -9,8 +9,8 @@ class ProfileViewModel : ViewModel() {
     // LiveData for observing a user
     val user = MutableLiveData<User?>()
 
-    fun loadUser(username: String) {
-        repository.getUser(username) { loadedUser ->
+    fun loadUser() {
+        repository.getUser { loadedUser ->
             user.value = loadedUser
         }
     }

@@ -138,7 +138,7 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                     Toast.LENGTH_SHORT
                 ).show()
 
-                if (ok) viewModel.loadUser(username) // Refresh after save
+                if (ok) viewModel.loadUser() // Refresh after save
             }
 
             // Check uniqueness before saving
@@ -156,7 +156,7 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                             if (ok) "Profile saved!" else "Save failed.",
                             Toast.LENGTH_SHORT
                         ).show()
-                        if (ok) viewModel.loadUser(username)
+                        if (ok) viewModel.loadUser()
                     }
                 }
             }
@@ -199,12 +199,7 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-
-        // Auto-load user if username already entered
-        val currentUsername = etUsername.text.toString().trim()
-        if (currentUsername.isNotEmpty()) {
-            viewModel.loadUser(currentUsername)
-        }
+        viewModel.loadUser()
     }
 
     companion object {
