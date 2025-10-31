@@ -40,9 +40,13 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
                     .commit()
             },
             onRemoveClick = { edge ->
-                viewModel.removeFriendByKey(edge.key)   // <- use doc ID
+                // Optimistic UI: remove immediately
+                val current = viewModel.friends.value ?: emptyList()
+                val newList = current.filterNot { it.key == edge.key }
+                (rv.adapter as FriendsAdapter).submit(newList)
+                viewModel.removeFriendByKey(edge.key)
+                // Optionally refresh from server after
                 viewModel.loadFriends()
-                Toast.makeText(requireContext(), "Removed ${edge.profile.name}", Toast.LENGTH_SHORT).show()
             }
         )
         rv.adapter = adapter
