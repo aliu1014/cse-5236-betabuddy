@@ -25,15 +25,13 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
 
         val rv = view.findViewById<RecyclerView>(R.id.rvFriends)
         val backButton = view.findViewById<Button>(R.id.btnBack)
-
         rv.layoutManager = LinearLayoutManager(requireContext())
 
-        // Adapter handles both chat + remove
         val adapter = FriendsAdapter(
-            onChatClick = { friend ->
+            onChatClick = { edge ->
                 val chat = ChatFragment().apply {
                     arguments = Bundle().apply {
-                        putString("chatPartnerName", friend.name.ifBlank { friend.email })
+                        putString("chatPartnerName", edge.profile.name.ifBlank { edge.key })
                     }
                 }
                 parentFragmentManager.beginTransaction()
@@ -41,18 +39,17 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
                     .addToBackStack(null)
                     .commit()
             },
-            onRemoveClick = { friend ->
-                viewModel.removeFriend(friend.email)
-                Toast.makeText(requireContext(), "Removed ${friend.name}", Toast.LENGTH_SHORT).show()
+            onRemoveClick = { edge ->
+                viewModel.removeFriendByKey(edge.key)   // <- use doc ID
                 viewModel.loadFriends()
+                Toast.makeText(requireContext(), "Removed ${edge.profile.name}", Toast.LENGTH_SHORT).show()
             }
         )
         rv.adapter = adapter
 
-        // Observe full list of friends (UserProfile)
-        viewModel.friends.observe(viewLifecycleOwner) { list ->
-            adapter.submit(list)
-            if (list.isEmpty()) {
+        viewModel.friends.observe(viewLifecycleOwner) { edges ->
+            adapter.submit(edges)
+            if (edges.isEmpty()) {
                 Toast.makeText(requireContext(), "No friends yet. Add some!", Toast.LENGTH_SHORT).show()
             }
         }
@@ -65,51 +62,36 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
     }
 }
 
-/**
- * Adapter for showing friends with chat and remove buttons.
- */
 private class FriendsAdapter(
-    private val onChatClick: (UserProfile) -> Unit,
-    private val onRemoveClick: (UserProfile) -> Unit
+    private val onChatClick: (FriendEdge) -> Unit,
+    private val onRemoveClick: (FriendEdge) -> Unit
 ) : RecyclerView.Adapter<FriendVH>() {
 
-    private val data = mutableListOf<UserProfile>()
-
-    fun submit(items: List<UserProfile>) {
-        data.clear()
-        data.addAll(items)
-        notifyDataSetChanged()
-    }
+    private val data = mutableListOf<FriendEdge>()
+    fun submit(items: List<FriendEdge>) { data.clear(); data.addAll(items); notifyDataSetChanged() }
 
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): FriendVH {
         val v = android.view.LayoutInflater.from(parent.context)
             .inflate(R.layout.row_friend, parent, false)
         return FriendVH(v, onChatClick, onRemoveClick)
     }
-
-    override fun onBindViewHolder(holder: FriendVH, position: Int) {
-        holder.bind(data[position])
-    }
-
-    override fun getItemCount(): Int = data.size
+    override fun onBindViewHolder(h: FriendVH, pos: Int) = h.bind(data[pos])
+    override fun getItemCount() = data.size
 }
 
-/**
- * ViewHolder for a single friend row (name + chat + remove button)
- */
 private class FriendVH(
     itemView: android.view.View,
-    private val onChatClick: (UserProfile) -> Unit,
-    private val onRemoveClick: (UserProfile) -> Unit
+    val onChatClick: (FriendEdge) -> Unit,
+    val onRemoveClick: (FriendEdge) -> Unit
 ) : RecyclerView.ViewHolder(itemView) {
 
     private val nameView = itemView.findViewById<android.widget.TextView>(R.id.tvFriendName)
-    private val chatBtn = itemView.findViewById<android.widget.ImageButton>(R.id.btnRowChat)
+    private val chatBtn  = itemView.findViewById<android.widget.ImageButton>(R.id.btnRowChat)
     private val removeBtn = itemView.findViewById<android.widget.Button>(R.id.btnRowRemove)
 
-    fun bind(friend: UserProfile) {
-        nameView.text = friend.name.ifBlank { friend.email }
-        chatBtn.setOnClickListener { onChatClick(friend) }
-        removeBtn.setOnClickListener { onRemoveClick(friend) }
+    fun bind(edge: FriendEdge) {
+        nameView.text = edge.profile.name.ifBlank { edge.key }
+        chatBtn.setOnClickListener { onChatClick(edge) }
+        removeBtn.setOnClickListener { onRemoveClick(edge) }
     }
 }
