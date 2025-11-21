@@ -21,6 +21,7 @@ import com.google.android.gms.location.FusedLocationProviderClient      // NEW
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import android.annotation.SuppressLint
+import android.widget.Spinner
 
 
 /**
@@ -36,7 +37,7 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
 
     private val viewModel: FindFriendsViewModel by viewModels()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-
+    private var lastRadiusMiles: Double = 20.0
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -45,7 +46,7 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
                     permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
 
         if (granted) {
-            getCurrentLocationAndSearchNearby()
+            getCurrentLocationAndSearchNearby(lastRadiusMiles)
         } else {
             // Permission denied -> show everybody
             viewModel.searchByCity(null)
@@ -60,6 +61,14 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
         val et = view.findViewById<EditText>(R.id.etFilterLocation)
         val rv = view.findViewById<RecyclerView>(R.id.rvResults)
         rv.layoutManager = LinearLayoutManager(requireContext())
+        val spRadius = view.findViewById<Spinner>(R.id.spRadiusMiles)
+        val btnNearby = view.findViewById<Button>(R.id.btnNearby)
+        btnNearby.setOnClickListener {
+            // Read selected radius from spinner, default to 30 if something goes weird
+            val radiusText = spRadius.selectedItem?.toString() ?: "20"
+            val radiusMiles = radiusText.toDoubleOrNull() ?: 20.0
+            requestLocationAndSearchNearby(radiusMiles)
+        }
 
         val adapter = SimpleResultsAdapter(
             onViewInfo = { pos ->
@@ -95,7 +104,7 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
             if (!text.isNullOrEmpty()) {
                 viewModel.searchByCity(text)
             } else {
-                requestLocationAndSearchNearby()
+                requestLocationAndSearchNearby(lastRadiusMiles)
             }
         }
 
@@ -116,7 +125,7 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
         if (savedInstanceState == null) viewModel.searchByCity(null)
     }
 
-    private fun requestLocationAndSearchNearby() {
+    private fun requestLocationAndSearchNearby(radiusMiles: Double) {
         val ctx = requireContext()
         val fineGranted = ActivityCompat.checkSelfPermission(
             ctx, Manifest.permission.ACCESS_FINE_LOCATION
@@ -126,7 +135,7 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
         ) == PackageManager.PERMISSION_GRANTED
 
         if (fineGranted || coarseGranted) {
-            getCurrentLocationAndSearchNearby()
+            getCurrentLocationAndSearchNearby(radiusMiles)
         } else {
             locationPermissionLauncher.launch(
                 arrayOf(
@@ -134,11 +143,13 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             )
+            // when permissions are granted, call getCurrentLocationAndSearchNearby()
+            // from your ActivityResult callback with a default radius if you want
         }
     }
 
     @SuppressLint("MissingPermission")
-    private fun getCurrentLocationAndSearchNearby() {
+    private fun getCurrentLocationAndSearchNearby(radiusMiles: Double) {
         val ctx = requireContext()
         val fineGranted = ActivityCompat.checkSelfPermission(
             ctx, Manifest.permission.ACCESS_FINE_LOCATION
@@ -149,13 +160,19 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
 
         if (!fineGranted && !coarseGranted) return
 
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                viewModel.searchNearby(location.latitude, location.longitude, radiusMiles = 30.0)
-            } else {
-                viewModel.searchByCity(null)
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    viewModel.searchNearby(
+                        location.latitude,
+                        location.longitude,
+                        radiusMiles = radiusMiles
+                    )
+                } else {
+                    // fallback – maybe show everyone or same city
+                    viewModel.searchByCity(null)
+                }
             }
-        }
     }
 }
 

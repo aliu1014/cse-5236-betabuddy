@@ -5,6 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Spinner
+        android:id="@+id/spRadiusMiles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:entries="@array/radius_options_miles"
+        android:prompt="@string/select_radius_prompt" />
+
     <!-- Location Filter -->
     <EditText
         android:id="@+id/etFilterLocation"
@@ -26,6 +33,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/search" />
+        <Button
+            android:id="@+id/btnNearby"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="NEARBY" />
 
         <Button
             android:id="@+id/btnPending"

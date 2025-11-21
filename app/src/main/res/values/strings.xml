@@ -117,4 +117,7 @@
         <item>V9</item>
         <item>V10+</item>
     </string-array>
+
+    <string name="select_radius_prompt">Radius (miles)</string>
+
 </resources>
