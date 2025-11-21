@@ -18,5 +18,7 @@ data class User(
     val gradeLead: String = "",
     val hasGear: Boolean = false,
     val hasTopRopeCert: Boolean = false,
-    val hasLeadCert: Boolean = false
+    val hasLeadCert: Boolean = false,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )

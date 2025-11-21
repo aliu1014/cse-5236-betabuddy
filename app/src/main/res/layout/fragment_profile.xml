@@ -92,6 +92,13 @@
                 android:hint="Weight (lbs)"
                 android:inputType="number" />
 
+            <EditText
+                android:id="@+id/etLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="City (e.g. Columbus, OH)"
+                android:inputType="textCapWords" />
+
             <!-- Climbing grades -->
             <Spinner
                 android:id="@+id/spGradeTopRope"

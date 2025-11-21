@@ -1,5 +1,7 @@
 package com.example.betabuddy.friends
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -14,8 +16,12 @@ import com.example.betabuddy.friendlist.FriendsFragment
 import com.example.betabuddy.profile.ProfileFragment
 import com.example.betabuddy.request.RequestsFragment
 import kotlin.getValue
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.FusedLocationProviderClient      // NEW
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import android.annotation.SuppressLint
+
 
 /**
  * FindFriendsFragment
@@ -27,10 +33,29 @@ import kotlinx.coroutines.launch
  *  - A RecyclerView showing mock search results
  */
 class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) {
+
     private val viewModel: FindFriendsViewModel by viewModels()
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted =
+            permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+
+        if (granted) {
+            getCurrentLocationAndSearchNearby()
+        } else {
+            // Permission denied -> show everybody
+            viewModel.searchByCity(null)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         val et = view.findViewById<EditText>(R.id.etFilterLocation)
         val rv = view.findViewById<RecyclerView>(R.id.rvResults)
@@ -38,14 +63,12 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
 
         val adapter = SimpleResultsAdapter(
             onViewInfo = { pos ->
-                // get the selected hit (email + User)
                 val hit = viewModel.hits.value?.getOrNull(pos) ?: return@SimpleResultsAdapter
                 parentFragmentManager.commit {
                     replace(
                         R.id.fragment_container_view,
                         ProfileFragment().apply {
                             arguments = Bundle().apply {
-                                // pass the doc id (email) to your profile screen
                                 putString("email", hit.email)
                             }
                         }
@@ -55,24 +78,27 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
             },
             onSendRequest = { pos ->
                 val hit = viewModel.hits.value?.getOrNull(pos) ?: return@SimpleResultsAdapter
-                // send to recipient's email (doc id)
                 viewModel.sendRequest(hit.email)
-                // the repo removes this row from the list on success
             }
         )
         rv.adapter = adapter
 
-        // Observe pretty strings to render the rows
         viewModel.resultRows.observe(viewLifecycleOwner) { rows ->
             adapter.submit(rows)
         }
 
-        // Search button -> triggers Firestore query
+        // Search button:
+        // - text entered -> search by city
+        // - empty        -> GPS nearby search
         view.findViewById<Button>(R.id.btnSearch).setOnClickListener {
-            viewModel.search(et.text?.toString())
+            val text = et.text?.toString()?.trim()
+            if (!text.isNullOrEmpty()) {
+                viewModel.searchByCity(text)
+            } else {
+                requestLocationAndSearchNearby()
+            }
         }
 
-        // Pending Requests -> just navigate (listener runs inside RequestsFragment)
         view.findViewById<Button>(R.id.btnPending).setOnClickListener {
             parentFragmentManager.commit {
                 replace(R.id.fragment_container_view, RequestsFragment())
@@ -80,7 +106,6 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
             }
         }
 
-        // Friends list
         view.findViewById<Button>(R.id.btnViewFriends).setOnClickListener {
             parentFragmentManager.commit {
                 replace(R.id.fragment_container_view, FriendsFragment())
@@ -88,8 +113,49 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
             }
         }
 
-        // Initial load: show everyone
-        if (savedInstanceState == null) viewModel.search(null)
+        if (savedInstanceState == null) viewModel.searchByCity(null)
+    }
+
+    private fun requestLocationAndSearchNearby() {
+        val ctx = requireContext()
+        val fineGranted = ActivityCompat.checkSelfPermission(
+            ctx, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        val coarseGranted = ActivityCompat.checkSelfPermission(
+            ctx, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (fineGranted || coarseGranted) {
+            getCurrentLocationAndSearchNearby()
+        } else {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getCurrentLocationAndSearchNearby() {
+        val ctx = requireContext()
+        val fineGranted = ActivityCompat.checkSelfPermission(
+            ctx, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        val coarseGranted = ActivityCompat.checkSelfPermission(
+            ctx, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!fineGranted && !coarseGranted) return
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                viewModel.searchNearby(location.latitude, location.longitude, radiusMiles = 30.0)
+            } else {
+                viewModel.searchByCity(null)
+            }
+        }
     }
 }
 
@@ -129,14 +195,15 @@ private class TextRowVH(
         itemView.findViewById<android.widget.TextView>(R.id.tvName).text = text
         itemView.findViewById<android.widget.TextView>(R.id.tvLocation).text = ""
 
-        // If you later add a dedicated "View Info" button, wire it here:
         val viewInfoId = itemView.resources.getIdentifier("btnViewInfo", "id", itemView.context.packageName)
         if (viewInfoId != 0) {
-            itemView.findViewById<android.widget.Button>(viewInfoId)?.setOnClickListener { onViewInfo(pos) }
+            itemView.findViewById<android.widget.Button>(viewInfoId)
+                ?.setOnClickListener { onViewInfo(pos) }
         }
 
         itemView.findViewById<android.widget.Button>(R.id.btnRequest)
             .setOnClickListener { onSendRequest(pos) }
     }
 }
+
 

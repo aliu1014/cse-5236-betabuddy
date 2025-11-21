@@ -8,6 +8,7 @@ import com.example.betabuddy.profile.User
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
+import android.location.Location
 
 class FindFriendsRepository {
 
@@ -23,6 +24,22 @@ class FindFriendsRepository {
     private val _resultRows = MutableLiveData<List<String>>(emptyList())
     val resultRows: MutableLiveData<List<String>> get() = _resultRows
     fun clear() { usersReg?.remove(); usersReg = null }
+
+    private fun updateResults(list: List<UserHit>) {
+        _hits.value = list
+        _resultRows.value = list.map { hit ->
+            val u = hit.user
+            val name = u.name.ifBlank { u.username.ifBlank { "Anonymous" } }
+            val role = when {
+                u.gradeLead.isNotBlank()    -> "Lead ${u.gradeLead}"
+                u.gradeTopRope.isNotBlank() -> "Top rope ${u.gradeTopRope}"
+                u.gradeBoulder.isNotBlank() -> "Boulder ${u.gradeBoulder}"
+                else                        -> "Climber"
+            }
+            val loc = u.location.ifBlank { "Anywhere" }
+            "$name ($role) — $loc"
+        }
+    }
 
     /** Live search of all other users. If [location] is blank, shows everyone else. */
     fun searchUsers(location: String?) {
@@ -54,6 +71,38 @@ class FindFriendsRepository {
                     val loc = u.location.ifBlank { "Anywhere" }
                     "$name ($role) — $loc"
                 }
+            }
+    }
+
+    fun searchNearbyUsers(myLat: Double, myLng: Double, radiusMiles: Double) {
+        val me = auth.currentUser?.email ?: return
+        val radiusMeters = radiusMiles * 1609.34
+
+        usersReg?.remove()
+        usersReg = db.collection("users")
+            .addSnapshotListener { snap, _ ->
+                val list = snap?.documents?.mapNotNull { doc ->
+                    val u = doc.toObject<User>() ?: return@mapNotNull null
+                    val email = doc.id
+                    if (email == me) return@mapNotNull null      // exclude myself
+
+                    val uLat = u.latitude
+                    val uLng = u.longitude
+                    if (uLat == null || uLng == null) return@mapNotNull null
+
+                    val result = FloatArray(1)
+                    Location.distanceBetween(
+                        myLat, myLng,
+                        uLat, uLng,
+                        result
+                    )
+                    val distanceMeters = result[0]
+                    if (distanceMeters > radiusMeters) return@mapNotNull null
+
+                    UserHit(email, u)
+                } ?: emptyList()
+
+                updateResults(list)
             }
     }
 
