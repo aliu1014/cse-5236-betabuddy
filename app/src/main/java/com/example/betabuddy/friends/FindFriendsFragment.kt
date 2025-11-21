@@ -14,6 +14,7 @@ import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
 import com.example.betabuddy.friendlist.FriendsFragment
 import com.example.betabuddy.profile.ProfileFragment
+import com.example.betabuddy.profile.OtherProfileFragment
 import com.example.betabuddy.request.RequestsFragment
 import kotlin.getValue
 import com.google.android.gms.location.LocationServices
@@ -63,10 +64,11 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
         rv.layoutManager = LinearLayoutManager(requireContext())
         val spRadius = view.findViewById<Spinner>(R.id.spRadiusMiles)
         val btnNearby = view.findViewById<Button>(R.id.btnNearby)
+
         btnNearby.setOnClickListener {
-            // Read selected radius from spinner, default to 30 if something goes weird
             val radiusText = spRadius.selectedItem?.toString() ?: "20"
             val radiusMiles = radiusText.toDoubleOrNull() ?: 20.0
+            lastRadiusMiles = radiusMiles          // remember last radius
             requestLocationAndSearchNearby(radiusMiles)
         }
 
@@ -76,7 +78,7 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
                 parentFragmentManager.commit {
                     replace(
                         R.id.fragment_container_view,
-                        ProfileFragment().apply {
+                        OtherProfileFragment().apply {
                             arguments = Bundle().apply {
                                 putString("email", hit.email)
                             }
@@ -211,7 +213,21 @@ private class TextRowVH(
     fun bind(text: String, pos: Int) {
         itemView.findViewById<android.widget.TextView>(R.id.tvName).text = text
         itemView.findViewById<android.widget.TextView>(R.id.tvLocation).text = ""
+        val tvName = itemView.findViewById<android.widget.TextView>(R.id.tvName)
+        val tvLocation = itemView.findViewById<android.widget.TextView>(R.id.tvLocation)
+        val btnRequest = itemView.findViewById<android.widget.Button>(R.id.btnRequest)
 
+        tvName.text = text
+        tvLocation.text = ""   // or keep whatever you were doing here
+
+        // Clicking the **row** opens the profile
+        itemView.setOnClickListener { onViewInfo(pos) }
+
+        // (Optional) clicking just the name also opens the profile
+        tvName.setOnClickListener { onViewInfo(pos) }
+
+        // Send request button
+        btnRequest.setOnClickListener { onSendRequest(pos) }
         val viewInfoId = itemView.resources.getIdentifier("btnViewInfo", "id", itemView.context.packageName)
         if (viewInfoId != 0) {
             itemView.findViewById<android.widget.Button>(viewInfoId)
@@ -220,6 +236,7 @@ private class TextRowVH(
 
         itemView.findViewById<android.widget.Button>(R.id.btnRequest)
             .setOnClickListener { onSendRequest(pos) }
+
     }
 }
 

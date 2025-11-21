@@ -119,5 +119,25 @@
     </string-array>
 
     <string name="select_radius_prompt">Radius (miles)</string>
+    <!-- OtherProfileFragment strings -->
+    <string name="other_profile_title">Climber profile</string>
+    <string name="basic_info_header">Basic info</string>
+    <string name="height_header">Height</string>
+    <string name="weight_header">Weight (lbs)</string>
+
+    <!-- City / location -->
+    <string name="city_hint">City (e.g. Columbus, OH)</string>
+
+    <!-- Climbing grades section -->
+    <string name="climbing_grades">Climbing grades</string>
+    <string name="top_rope_grade_label">Top rope</string>
+    <string name="boulder_grade_label">Boulder</string>
+    <string name="lead_grade_label">Lead</string>
+
+    <!-- Gear & certs section -->
+    <string name="certs_and_gear_header">Certs &amp; gear</string>
+    <string name="has_climbing_gear">Has climbing gear</string>
+    <string name="top_rope_certified">Top rope certified</string>
+    <string name="lead_certified">Lead certified</string>
 
 </resources>

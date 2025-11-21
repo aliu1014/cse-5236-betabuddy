@@ -5,13 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Spinner
-        android:id="@+id/spRadiusMiles"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:entries="@array/radius_options_miles"
-        android:prompt="@string/select_radius_prompt" />
-
     <!-- Location Filter -->
     <EditText
         android:id="@+id/etFilterLocation"
@@ -33,13 +26,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/search" />
-        <Button
-            android:id="@+id/btnNearby"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:text="NEARBY" />
 
         <Button
             android:id="@+id/btnPending"
@@ -56,6 +42,40 @@
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:text="@string/view_friends" />
+    </LinearLayout>
+    <!-- Nearby + radius row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/btnNearby"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NEARBY" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="within"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp" />
+
+        <Spinner
+            android:id="@+id/spRadiusMiles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/radius_options_miles"
+            android:prompt="@string/select_radius_prompt" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="miles"
+            android:layout_marginStart="4dp" />
     </LinearLayout>
 
     <!-- Search Results List -->

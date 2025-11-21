@@ -62,4 +62,14 @@ class ProfileRepository {
                 onResult(false)
             }
     }
+
+    fun getUserByEmail(email: String, onResult: (User?) -> Unit) {
+        db.collection("users").document(email)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val user = snapshot.toObject(User::class.java)
+                onResult(user)
+            }
+            .addOnFailureListener { onResult(null) }
+    }
 }
