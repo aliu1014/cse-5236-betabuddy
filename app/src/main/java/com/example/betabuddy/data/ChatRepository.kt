@@ -6,4 +6,5 @@ import com.example.betabuddy.model.ChatMessage
 interface ChatRepository {
     fun messages(meUid: String, peerUid: String): LiveData<List<ChatMessage>>
     suspend fun send(meUid: String, peerUid: String, text: String)
+    fun markThreadRead(meUid: String, peerUid: String)
 }

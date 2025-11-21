@@ -1,18 +1,17 @@
 package com.example.betabuddy.chat
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.ArrayAdapter
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
 import com.example.betabuddy.friendlist.FriendsFragment
-
+import com.google.firebase.auth.FirebaseAuth // ⭐ NEW
+import com.example.betabuddy.data.FirestoreChatRepository // ⭐ NEW
 /**
  * ChatFragment
  * ------------
@@ -25,6 +24,11 @@ class ChatFragment : BaseLoggingFragment(R.layout.fragment_chat) {
     private lateinit var chatListView: ListView
     private lateinit var chatAdapter: ArrayAdapter<String>
     private val chatMessages = mutableListOf<String>()
+
+    private val viewModel: ChatViewModel by viewModels {
+        ChatVMFactory(FirestoreChatRepository())
+    }
+
     //Where UI elements are connected and event listeners are defined
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,14 +48,34 @@ class ChatFragment : BaseLoggingFragment(R.layout.fragment_chat) {
                 .commit()
         }
 
-         //Send button click listener to perform chat actions
+        // Pulling the two IDs needed for the chat
+        val meUid = FirebaseAuth.getInstance().currentUser?.email ?: ""
+        val peerUid = requireArguments().getString("peerUid") ?: ""
+        val partnerName = requireArguments().getString("chatPartnerName") ?: peerUid
+
+        // Tells the VM which conversation to load
+        viewModel.bind(meUid, peerUid)
+
+        // Pass name into ViewModel
+        viewModel.setPeerName(partnerName)
+
+        // Observe Firestore messages
+        viewModel.messageRows.observe(viewLifecycleOwner) { rows ->
+            chatMessages.clear()
+            chatMessages.addAll(rows)
+            chatAdapter.notifyDataSetChanged()
+            chatListView.smoothScrollToPosition(chatMessages.size - 1)
+
+            // Mark them as read immediately
+            viewModel.markThreadRead()
+        }
+
+        // Send a Firestore message, not just local UI
         sendButton.setOnClickListener {
             val message = messageInput.text.toString().trim()
             if (message.isNotEmpty()) {
-                chatMessages.add("You: $message")
-                chatAdapter.notifyDataSetChanged()
+                viewModel.send(message)
                 messageInput.text.clear()
-                chatListView.smoothScrollToPosition(chatMessages.size - 1)
             }
         }
     }

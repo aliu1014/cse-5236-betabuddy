@@ -7,7 +7,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 
 // Carry both the Firestore doc id (key) and the stored profile
-data class FriendEdge(val key: String, val profile: UserProfile)
+data class FriendEdge(
+    val key: String,
+    val profile: UserProfile,
+    val unread: Int = 0
+)
 class FriendsRepository {
 
     private val db = FirebaseFirestore.getInstance()

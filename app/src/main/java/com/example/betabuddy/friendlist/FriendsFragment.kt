@@ -31,6 +31,7 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
             onChatClick = { edge ->
                 val chat = ChatFragment().apply {
                     arguments = Bundle().apply {
+                        putString("peerUid", edge.key)
                         putString("chatPartnerName", edge.profile.name.ifBlank { edge.key })
                     }
                 }
@@ -41,7 +42,7 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
             },
             onRemoveClick = { edge ->
                 // Optimistic UI: remove immediately
-                val current = viewModel.friends.value ?: emptyList()
+                val current = viewModel.friendsWithUnread.value ?: emptyList()
                 val newList = current.filterNot { it.key == edge.key }
                 (rv.adapter as FriendsAdapter).submit(newList)
                 viewModel.removeFriendByKey(edge.key)
@@ -51,8 +52,10 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
         )
         rv.adapter = adapter
 
-        viewModel.friends.observe(viewLifecycleOwner) { edges ->
+        // Combined LiveData of friend profiles plus unread counts
+        viewModel.friendsWithUnread.observe(viewLifecycleOwner) { edges ->
             adapter.submit(edges)
+
             if (edges.isEmpty()) {
                 Toast.makeText(requireContext(), "No friends yet. Add some!", Toast.LENGTH_SHORT).show()
             }
@@ -72,13 +75,18 @@ private class FriendsAdapter(
 ) : RecyclerView.Adapter<FriendVH>() {
 
     private val data = mutableListOf<FriendEdge>()
-    fun submit(items: List<FriendEdge>) { data.clear(); data.addAll(items); notifyDataSetChanged() }
+    fun submit(items: List<FriendEdge>) {
+        data.clear()
+        data.addAll(items)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): FriendVH {
         val v = android.view.LayoutInflater.from(parent.context)
             .inflate(R.layout.row_friend, parent, false)
         return FriendVH(v, onChatClick, onRemoveClick)
     }
+
     override fun onBindViewHolder(h: FriendVH, pos: Int) = h.bind(data[pos])
     override fun getItemCount() = data.size
 }
@@ -90,11 +98,20 @@ private class FriendVH(
 ) : RecyclerView.ViewHolder(itemView) {
 
     private val nameView = itemView.findViewById<android.widget.TextView>(R.id.tvFriendName)
-    private val chatBtn  = itemView.findViewById<android.widget.ImageButton>(R.id.btnRowChat)
+    private val chatBtn = itemView.findViewById<android.widget.ImageButton>(R.id.btnRowChat)
     private val removeBtn = itemView.findViewById<android.widget.Button>(R.id.btnRowRemove)
+    private val unreadView = itemView.findViewById<android.widget.TextView>(R.id.tvUnreadBadge)
 
     fun bind(edge: FriendEdge) {
         nameView.text = edge.profile.name.ifBlank { edge.key }
+
+        if (edge.unread > 0) {
+            unreadView.visibility = View.VISIBLE
+            unreadView.text = edge.unread.toString()
+        } else {
+            unreadView.visibility = View.GONE
+        }
+
         chatBtn.setOnClickListener { onChatClick(edge) }
         removeBtn.setOnClickListener { onRemoveClick(edge) }
     }

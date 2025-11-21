@@ -19,6 +19,11 @@ class ChatViewModel(
 
     private val participants = MutableLiveData<Pair<String, String>>() // (meUid, peerUid)
     private var meUidCache: String = ""
+    private var peerName: String = "Them"
+
+    fun setPeerName(name: String) {
+        peerName = name
+    }
 
     /** Live Firestore-backed messages for (me, peer) */
     val messages: LiveData<List<ChatMessage>> =
@@ -30,7 +35,13 @@ class ChatViewModel(
     /** Convenience for your current ListView adapter */
     val messageRows: LiveData<List<String>> = messages.map { list ->
         list.map { m ->
-            if (m.senderId == meUidCache) "You: ${m.message}" else "Them: ${m.message}"
+            if (m.senderId == meUidCache) "You: ${m.message}" else "$peerName: ${m.message}"
+        }
+    }
+
+    val unreadCount: LiveData<Int> = messages.map { list ->
+        list.count { msg ->
+            msg.senderId != meUidCache && !msg.readBy.contains(meUidCache)
         }
     }
 
@@ -46,6 +57,11 @@ class ChatViewModel(
         val (me, peer) = participants.value ?: return
         if (text.isBlank()) return
         viewModelScope.launch { repo.send(me, peer, text) }
+    }
+
+    fun markThreadRead() {
+        val (me, peer) = participants.value ?: return
+        repo.markThreadRead(me, peer)
     }
 }
 
