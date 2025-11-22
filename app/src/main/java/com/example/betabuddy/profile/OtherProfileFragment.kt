@@ -2,10 +2,12 @@ package com.example.betabuddy.profile
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
+import com.example.betabuddy.friends.FindFriendsFragment
 
 class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile) {
 
@@ -34,6 +36,14 @@ class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile
         val tvGear     = view.findViewById<TextView>(R.id.tvGear)
         val tvTopCert  = view.findViewById<TextView>(R.id.tvTopCert)
         val tvLeadCert = view.findViewById<TextView>(R.id.tvLeadCert)
+
+        // Set up the Back button to navigate back to the FindFriendsFragment
+        view.findViewById<Button>(R.id.btnBack).setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container_view, FindFriendsFragment())
+                .addToBackStack(null)
+                .commit()
+        }
 
         repo.getUserByEmail(email) { u ->
             if (u == null) {

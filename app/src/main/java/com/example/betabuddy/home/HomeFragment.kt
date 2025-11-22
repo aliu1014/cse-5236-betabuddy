@@ -69,67 +69,26 @@ class HomeFragment : BaseLoggingFragment(R.layout.fragment_home) {
                 addToBackStack(null)
             }
         }
+
+        // --- LOGOUT BUTTON ---
+        // --- LOGOUT BUTTON ---
+        val logoutBtn = view.findViewById<Button>(R.id.btnLogout)
+        logoutBtn.setOnClickListener {
+            // 1. Sign out from Firebase
+            FirebaseAuth.getInstance().signOut()
+
+            // 2. Clear the back stack so back cannot return to Home
+            parentFragmentManager.popBackStack(
+                null,
+                androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+
+            // 3. Go to LoginFragment without adding it to back stack
+            parentFragmentManager.commit {
+                replace(R.id.fragment_container_view, LoginFragment())
+            }
+
+            Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
+        }
     }
 }
-
-
-
-
-
-//package com.example.betabuddy.home
-//
-//import android.os.Bundle
-//import android.view.View
-//import android.widget.Button
-//import androidx.fragment.app.commit
-//import com.example.betabuddy.R
-//import com.example.betabuddy.core.BaseLoggingFragment
-//import com.example.betabuddy.find.FindFriendsFragment
-//import com.example.betabuddy.friendlist.FriendsFragment
-//import com.example.betabuddy.profile.ProfileFragment
-//
-//import android.widget.Toast
-//import com.google.firebase.ktx.Firebase
-//import com.google.firebase.firestore.ktx.firestore
-//
-//
-///**
-// * Home Fragment
-// * -------------
-// * This fragment provides a space where the user is able to navigate to the different features such as:
-// * Find Friends, View Profile, View Friend List
-// * The UI Contains:
-// * -A button navigating to Find Friends Page
-// * -A button navigating to View Profile Page
-// * -A button navigating to View Friends Page
-// */
-//
-//class HomeFragment : BaseLoggingFragment(R.layout.fragment_home) {
-//
-//    //Sets up the button click listeners for navigating to different sections of the app.
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//
-//        //Navigates to Find Friends page, where they can search for and send requests
-//        view.findViewById<Button>(R.id.btnFindFriends).setOnClickListener {
-//            parentFragmentManager.commit {
-//                replace(R.id.fragment_container_view, FindFriendsFragment())
-//                addToBackStack(null)
-//            }
-//        }
-//        //Navigates to Profile page, where they can view and edit profile details
-//        view.findViewById<Button>(R.id.btnViewProfile).setOnClickListener {
-//            parentFragmentManager.commit {
-//                replace(R.id.fragment_container_view, ProfileFragment())
-//                addToBackStack(null)
-//            }
-//        }
-//        //Navigates to View Friends page, where they can view their current friend list
-//        view.findViewById<Button>(R.id.btnViewFriends).setOnClickListener {
-//            parentFragmentManager.commit {
-//                replace(R.id.fragment_container_view, FriendsFragment())
-//                addToBackStack(null)
-//            }
-//        }
-//    }
-//}
