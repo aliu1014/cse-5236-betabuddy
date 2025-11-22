@@ -159,5 +159,25 @@ class FindFriendsRepository {
                     }
             }
     }
+
+    fun searchNearbyFromMyProfile(radiusMiles: Double) {
+        val meEmail = auth.currentUser?.email ?: return
+
+        db.collection("users").document(meEmail).get()
+            .addOnSuccessListener { doc ->
+                val me = doc.toObject<User>() ?: return@addOnSuccessListener
+                val myLat = me.latitude
+                val myLng = me.longitude
+
+                if (myLat == null || myLng == null) {
+                    // No coordinates saved for me; fall back to city search or show all
+                    searchUsers(null)
+                    return@addOnSuccessListener
+                }
+
+                // Re-use your existing nearby logic
+                searchNearbyUsers(myLat, myLng, radiusMiles)
+            }
+    }
 }
 

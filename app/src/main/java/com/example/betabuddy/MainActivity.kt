@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.betabuddy.login.LoginFragment
+import com.google.android.libraries.places.api.Places
+
 
 
 /**
@@ -23,6 +25,9 @@ class MainActivity : AppCompatActivity() {
     //Sets up the UI layout and loads the LoginFragment
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, getString(R.string.google_maps_key))
+        }
         Log.d(tag, "onCreate()")
         setContentView(R.layout.activity_main)
         //Only adds LoginFragment if there is no svaed instance state

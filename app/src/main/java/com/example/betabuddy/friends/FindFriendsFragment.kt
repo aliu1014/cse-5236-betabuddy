@@ -57,8 +57,6 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
-
         val et = view.findViewById<EditText>(R.id.etFilterLocation)
         val rv = view.findViewById<RecyclerView>(R.id.rvResults)
         rv.layoutManager = LinearLayoutManager(requireContext())
@@ -68,8 +66,9 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
         btnNearby.setOnClickListener {
             val radiusText = spRadius.selectedItem?.toString() ?: "20"
             val radiusMiles = radiusText.toDoubleOrNull() ?: 20.0
-            lastRadiusMiles = radiusMiles          // remember last radius
-            requestLocationAndSearchNearby(radiusMiles)
+            lastRadiusMiles = radiusMiles
+            // Use logged-in user's profile location as center
+            viewModel.searchNearbyFromProfile(radiusMiles)
         }
 
         val adapter = SimpleResultsAdapter(
@@ -100,13 +99,13 @@ class FindFriendsFragment : BaseLoggingFragment(R.layout.fragment_find_friends) 
 
         // Search button:
         // - text entered -> search by city
-        // - empty        -> GPS nearby search
+        // - empty        -> nearby based on my profile location
         view.findViewById<Button>(R.id.btnSearch).setOnClickListener {
             val text = et.text?.toString()?.trim()
             if (!text.isNullOrEmpty()) {
                 viewModel.searchByCity(text)
             } else {
-                requestLocationAndSearchNearby(lastRadiusMiles)
+                viewModel.searchNearbyFromProfile(lastRadiusMiles)
             }
         }
 

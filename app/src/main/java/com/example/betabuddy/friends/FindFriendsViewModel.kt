@@ -15,6 +15,9 @@ class FindFriendsViewModel(
     fun searchByCity(location: String?) = repo.searchUsers(location)
     fun searchNearby(lat: Double, lng: Double, radiusMiles: Double = 20.0) =
         repo.searchNearbyUsers(lat, lng, radiusMiles)
+
+    fun searchNearbyFromProfile(radiusMiles: Double) =
+        repo.searchNearbyFromMyProfile(radiusMiles)
     fun sendRequest(toEmail: String, message: String = "") =
         repo.sendFriendRequest(toEmail, message)
     override fun onCleared() {
