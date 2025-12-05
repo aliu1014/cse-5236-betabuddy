@@ -1,36 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="24dp"
-    android:gravity="center_horizontal"
-    android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/btnFindFriends"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="@string/find_friends"/>
-
-    <Button
-        android:id="@+id/btnViewProfile"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/view_profile"/>
-
-    <Button
-        android:id="@+id/btnViewFriends"
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:src="@drawable/rockclimbingbgrd"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="@string/view_friends" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0.18" />
 
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/purple_500"
-        android:textColor="@android:color/white"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="24dp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center">
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btnFindFriends"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="32dp"
+            android:backgroundTint="@color/blue"
+            android:textColor="@android:color/white"
+            android:text="@string/find_friends"/>
+
+        <Button
+            android:id="@+id/btnViewProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:paddingHorizontal="32dp"
+            android:backgroundTint="@color/orange"
+            android:textColor="@android:color/white"
+            android:text="@string/view_profile"/>
+
+        <Button
+            android:id="@+id/btnViewFriends"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:paddingHorizontal="32dp"
+            android:backgroundTint="@color/brown"
+            android:textColor="@android:color/white"
+            android:text="@string/view_friends"/>
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/dark_teal"
+            android:textColor="@android:color/white"
+            android:text="Logout"/>
+
+    </LinearLayout>
+
+</FrameLayout>
+
 

@@ -30,6 +30,7 @@
     <string name="view_info">View Info</string>
 
     <!-- Profile -->
+    <string name="pfp">Profile Picture</string>
     <string name="name">Name</string>
     <string name="age">Age</string>
     <string name="gender">Gender</string>
@@ -140,5 +141,7 @@
     <string name="top_rope_certified">Top rope certified</string>
     <string name="lead_certified">Lead certified</string>
     <string name="google_maps_key">AIzaSyBJ9xRhyF3QTK9K7KJfjedBT-sYUodtODQ</string>
+
+    <string name="remove">Remove</string>
 
 </resources>

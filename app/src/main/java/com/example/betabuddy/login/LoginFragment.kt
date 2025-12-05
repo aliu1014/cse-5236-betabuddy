@@ -6,9 +6,11 @@ import com.example.betabuddy.home.HomeFragment
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.EditText
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import android.widget.ImageButton
 
 /**
  * Login Fragment
@@ -33,7 +35,7 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
         val usernameInput = view.findViewById<EditText>(R.id.etEmail)
         val passwordInput = view.findViewById<EditText>(R.id.etPassword)
         val loginButton = view.findViewById<Button>(R.id.btnLogin)
-        val signupButton = view.findViewById<Button>(R.id.btnSignup)
+        val signupButton = view.findViewById<TextView>(R.id.btnSignup)
 
         // Handle pressing Enter (Done) on keyboard to log in properly
         passwordInput.setOnEditorActionListener { _, actionId, _ ->

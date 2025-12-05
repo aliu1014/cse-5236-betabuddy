@@ -38,12 +38,22 @@
         android:id="@+id/btnLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/login_button"/>
+        android:layout_marginTop="16dp"
+        android:background="@color/dark_teal"
+        android:text="@string/login_button"
+        android:textColor="@android:color/white" />
 
-    <Button
+    <TextView
         android:id="@+id/btnSignup"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/signup_button"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:text="@string/signup_button"
+        android:textColor="@color/brown"
+        android:textStyle="bold"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackgroundBorderless" />
 
 </LinearLayout>

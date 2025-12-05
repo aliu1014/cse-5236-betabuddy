@@ -1,9 +1,17 @@
-<Button
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/btnHome"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="@string/home_button_text"
-    android:layout_marginTop="16dp"
-    android:backgroundTint="@color/teal_700"
-    android:textColor="@android:color/white" />
+    android:layout_gravity="center_horizontal"
+    android:text="HOME"
+    android:textAllCaps="true"
+    android:textColor="@android:color/white"
+    android:textStyle="bold"
+    android:background="@color/dark_teal"
+    android:paddingHorizontal="24dp"
+    android:paddingVertical="10dp" />
+
+
+
+

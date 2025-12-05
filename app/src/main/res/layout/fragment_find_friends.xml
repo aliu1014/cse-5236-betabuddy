@@ -1,92 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="24dp"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Location Filter -->
-    <EditText
-        android:id="@+id/etFilterLocation"
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/bgImage"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:hint="@string/filter_by_location"
-        android:padding="12dp" />
+        android:layout_height="match_parent"
+        android:src="@drawable/rockclimbingbgrd"
+        android:scaleType="centerCrop"
+        android:alpha="0.25" />
 
-    <!-- Search / Pending / Friends Buttons -->
+    <!-- Main Content -->
     <LinearLayout
+        android:orientation="vertical"
+        android:padding="24dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
+        android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/btnSearch"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/search" />
+        <!-- Location Filter -->
+        <EditText
+            android:id="@+id/etFilterLocation"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="@string/filter_by_location"
+            android:padding="12dp" />
 
-        <Button
-            android:id="@+id/btnPending"
-            android:layout_width="0dp"
+        <!-- Search / Pending / Friends Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:text="@string/pending_requests" />
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
 
-        <Button
-            android:id="@+id/btnViewFriends"
-            android:layout_width="0dp"
+            <Button
+                android:id="@+id/btnSearch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/search" />
+
+            <Button
+                android:id="@+id/btnPending"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="@string/pending_requests" />
+
+            <Button
+                android:id="@+id/btnViewFriends"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="@string/view_friends" />
+        </LinearLayout>
+
+        <!-- Nearby + radius row -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btnNearby"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NEARBY" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="within"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp" />
+
+            <Spinner
+                android:id="@+id/spRadiusMiles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/radius_options_miles"
+                android:prompt="@string/select_radius_prompt" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="miles"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+
+        <!-- Search Results List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvResults"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:text="@string/view_friends" />
+            android:layout_marginTop="12dp" />
+
+        <!-- Global Home Button -->
+        <include layout="@layout/include_home_button" />
+
     </LinearLayout>
-    <!-- Nearby + radius row -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="8dp">
 
-        <Button
-            android:id="@+id/btnNearby"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="NEARBY" />
+</FrameLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="within"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="4dp" />
-
-        <Spinner
-            android:id="@+id/spRadiusMiles"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/radius_options_miles"
-            android:prompt="@string/select_radius_prompt" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="miles"
-            android:layout_marginStart="4dp" />
-    </LinearLayout>
-
-    <!-- Search Results List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvResults"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="12dp" />
-
-    <!-- Global Home Button -->
-    <include layout="@layout/include_home_button" />
-
-</LinearLayout>

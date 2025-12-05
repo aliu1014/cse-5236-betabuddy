@@ -1,179 +1,220 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="24dp"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Scrollable content area -->
-    <ScrollView
+    <!-- Background image (fixed) -->
+    <ImageView
+        android:id="@+id/bgImage"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        android:src="@drawable/rockclimbingbgrd"
+        android:scaleType="centerCrop"
+        android:alpha="0.25" />
 
-        <LinearLayout
-            android:orientation="vertical"
+    <!-- Foreground content in the OLD style (LinearLayout + ScrollView) -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Profile picture -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imageProfile"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/default_pfp"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/pfp"
+            app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+        <!-- 🔽 Everything between avatar and DELETE PROFILE scrolls -->
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!-- Unique identifier -->
-            <EditText
-                android:id="@+id/etUsername"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Username"
-                android:inputType="textPersonName" />
-
-            <!-- Basic information -->
-            <EditText
-                android:id="@+id/etName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Full Name"
-                android:inputType="textPersonName" />
-
-            <Spinner
-                android:id="@+id/spGender"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:padding="8dp"
-                android:background="@drawable/spinner_outline"
-                android:spinnerMode="dropdown" />
-
-
-            <EditText
-                android:id="@+id/etAge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Age"
-                android:inputType="number" />
-
-            <!-- Height: feet + inches side by side -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Height"
-                android:layout_marginTop="8dp"
-                android:textStyle="bold" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:weightSum="2"
-                android:gravity="center_vertical">
+                android:layout_height="wrap_content">
 
+                <!-- Username -->
                 <EditText
-                    android:id="@+id/etHeightFeet"
-                    android:layout_width="0dp"
+                    android:id="@+id/etUsername"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="Feet"
-                    android:inputType="number"
-                    android:imeOptions="actionNext"
-                    android:paddingEnd="8dp" />
+                    android:hint="Username"
+                    android:inputType="textPersonName" />
 
+                <!-- Full Name -->
                 <EditText
-                    android:id="@+id/etHeightInches"
-                    android:layout_width="0dp"
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="Inches"
-                    android:inputType="number"
-                    android:imeOptions="actionDone" />
+                    android:hint="Full Name"
+                    android:inputType="textPersonName" />
+
+                <!-- Gender Spinner -->
+                <Spinner
+                    android:id="@+id/spGender"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:padding="8dp"
+                    android:background="@drawable/spinner_outline"
+                    android:spinnerMode="dropdown" />
+
+                <!-- Age -->
+                <EditText
+                    android:id="@+id/etAge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Age"
+                    android:inputType="number" />
+
+                <!-- Height label -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Height"
+                    android:layout_marginTop="8dp"
+                    android:textStyle="bold" />
+
+                <!-- Height: feet + inches -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="2"
+                    android:gravity="center_vertical">
+
+                    <EditText
+                        android:id="@+id/etHeightFeet"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Feet"
+                        android:inputType="number"
+                        android:paddingEnd="8dp" />
+
+                    <EditText
+                        android:id="@+id/etHeightInches"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Inches"
+                        android:inputType="number" />
+                </LinearLayout>
+
+                <!-- Weight -->
+                <EditText
+                    android:id="@+id/etWeight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Weight (lbs)"
+                    android:inputType="number" />
+
+                <!-- Location -->
+                <EditText
+                    android:id="@+id/etLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="City (e.g. Columbus, OH)"
+                    android:inputType="textCapWords" />
+
+                <Button
+                    android:id="@+id/btnPickOnMap"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pick on map"
+                    android:layout_marginTop="8dp" />
+
+                <!-- Climbing grades -->
+                <Spinner
+                    android:id="@+id/spGradeTopRope"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:padding="8dp"
+                    android:background="@drawable/spinner_outline"
+                    android:spinnerMode="dropdown" />
+
+                <Spinner
+                    android:id="@+id/spGradeBoulder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:padding="8dp"
+                    android:background="@drawable/spinner_outline"
+                    android:spinnerMode="dropdown" />
+
+                <Spinner
+                    android:id="@+id/spGradeLead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:padding="8dp"
+                    android:background="@drawable/spinner_outline"
+                    android:spinnerMode="dropdown" />
+
+                <!-- Gear and certifications -->
+                <CheckBox
+                    android:id="@+id/cbHasGear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Has Climbing Gear" />
+
+                <CheckBox
+                    android:id="@+id/cbTopRopeCert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Top Rope Certified" />
+
+                <CheckBox
+                    android:id="@+id/cbLeadCert"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lead Certified" />
+
+                <!-- Save button INSIDE scroll area -->
+                <Button
+                    android:id="@+id/btnSaveProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/save" />
+
             </LinearLayout>
+        </ScrollView>
 
-            <EditText
-                android:id="@+id/etWeight"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Weight (lbs)"
-                android:inputType="number" />
+        <!-- These stay pinned at the bottom and do NOT scroll -->
+        <Button
+            android:id="@+id/btnDeleteProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Delete Profile"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:textColor="@android:color/white" />
 
-            <EditText
-                android:id="@+id/etLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="City (e.g. Columbus, OH)"
-                android:inputType="textCapWords" />
+        <include layout="@layout/include_home_button" />
 
-            <Button
-                android:id="@+id/btnPickOnMap"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Pick on map"
-                android:layout_marginTop="8dp" />
+    </LinearLayout>
+</FrameLayout>
 
-            <!-- Climbing grades -->
-            <Spinner
-                android:id="@+id/spGradeTopRope"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:padding="8dp"
-                android:background="@drawable/spinner_outline"
-                android:spinnerMode="dropdown" />
 
-            <Spinner
-                android:id="@+id/spGradeBoulder"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:padding="8dp"
-                android:background="@drawable/spinner_outline"
-                android:spinnerMode="dropdown" />
 
-            <Spinner
-                android:id="@+id/spGradeLead"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:padding="8dp"
-                android:background="@drawable/spinner_outline"
-                android:spinnerMode="dropdown" />
 
-            <!-- Gear and certifications -->
-            <CheckBox
-                android:id="@+id/cbHasGear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Has Climbing Gear" />
 
-            <CheckBox
-                android:id="@+id/cbTopRopeCert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Top Rope Certified" />
 
-            <CheckBox
-                android:id="@+id/cbLeadCert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lead Certified" />
-
-            <Button
-                android:id="@+id/btnSaveProfile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/save" />
-        </LinearLayout>
-    </ScrollView>
-
-    <Button
-        android:id="@+id/btnDeleteProfile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Delete Profile"
-        android:backgroundTint="@android:color/holo_red_dark"
-        android:textColor="@android:color/white" />
-
-    <!-- Home button pinned to bottom -->
-    <include layout="@layout/include_home_button" />
-</LinearLayout>

@@ -7,11 +7,16 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import android.widget.ImageButton
 import androidx.fragment.app.viewModels
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
 import java.io.IOException
 import java.util.Locale
+import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.material.imageview.ShapeableImageView
+import android.content.Context
 
 /**
  * Displays and edits the full climbing profile for the current user.
@@ -26,10 +31,20 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
     // Coordinates picked on the map (or geocoded from text)
     private var pickedLat: Double? = null
     private var pickedLng: Double? = null
+    private lateinit var imageProfile: ShapeableImageView
+
+    // Activity Result API for picking an image from photo library
+    private val pickImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                imageProfile.setImageURI(it)
+                saveProfileImageUri(it)        // persist URI
+            }
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        imageProfile = view.findViewById(R.id.imageProfile)
         // UI refs
         val etUsername      = view.findViewById<EditText>(R.id.etUsername)
         val etName          = view.findViewById<EditText>(R.id.etName)
@@ -138,8 +153,17 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 cbLeadCert.isChecked    = u.hasLeadCert
             }
         }
+        // Load any saved profile picture
+        loadProfileImageUri()?.let { uri ->
+            imageProfile.setImageURI(uri)
+        }
 
-// SAVE PROFILE
+        // Open gallery/photo library when tapped
+        imageProfile.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+        }
+
+        // SAVE PROFILE
         btnSave.setOnClickListener {
             val username = etUsername.text.toString().trim()
             if (username.isEmpty()) {
@@ -256,6 +280,21 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
 
         // Initial load
         viewModel.loadUser()
+    }
+
+    private fun saveProfileImageUri(uri: Uri) {
+        val prefs = requireContext()
+            .getSharedPreferences("profile_prefs", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString("profile_image_uri", uri.toString())
+            .apply()
+    }
+
+    private fun loadProfileImageUri(): Uri? {
+        val prefs = requireContext()
+            .getSharedPreferences("profile_prefs", Context.MODE_PRIVATE)
+        val uriString = prefs.getString("profile_image_uri", null)
+        return uriString?.let { Uri.parse(it) }
     }
 
     companion object {

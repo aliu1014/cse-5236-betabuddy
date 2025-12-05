@@ -1,41 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="24dp"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Scrollable content area -->
-    <ScrollView
+    <!-- Background image -->
+    <ImageView
+        android:id="@+id/bgImage"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent"
+        android:src="@drawable/rockclimbingbgrd"
+        android:scaleType="centerCrop"
+        android:alpha="0.18" />
 
-        <LinearLayout
-            android:orientation="vertical"
+    <!-- Existing layout moved inside FrameLayout -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Scrollable content area -->
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-            <!-- Friend list -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvFriends"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:layout_marginTop="12dp" />
+                android:layout_height="wrap_content">
 
-            <!-- Back button (goes back to Find Friends) -->
-            <Button
-                android:id="@+id/btnBack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Back"
-                android:layout_gravity="start"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp" />
-        </LinearLayout>
-    </ScrollView>
+                <!-- Friend list -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvFriends"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_marginTop="12dp" />
 
-    <!-- Home button pinned to bottom -->
-    <include layout="@layout/include_home_button" />
-</LinearLayout>
+                <!-- Back button -->
+                <Button
+                    android:id="@+id/btnBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Back"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp" />
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Home button pinned to bottom -->
+        <include layout="@layout/include_home_button" />
+    </LinearLayout>
+
+</FrameLayout>
+

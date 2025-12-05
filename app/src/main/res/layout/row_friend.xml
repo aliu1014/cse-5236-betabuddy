@@ -42,14 +42,14 @@
         android:padding="8dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@android:drawable/ic_menu_send"
-        app:tint="@color/purple_500" />
+        app:tint="@color/blue" />
 
     <!-- Delete / Remove button -->
     <Button
         android:id="@+id/btnRowRemove"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Remove"
+        android:text="@string/remove"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         android:backgroundTint="#E53935"
