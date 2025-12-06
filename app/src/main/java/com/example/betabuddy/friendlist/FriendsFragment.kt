@@ -19,6 +19,9 @@ import com.example.betabuddy.model.UserProfile
 class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
 
     private val viewModel: FriendsViewModel by viewModels()
+    private val pageSize = 10
+    private var currentPage = 1
+    private var allFriends: List<FriendEdge> = emptyList()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

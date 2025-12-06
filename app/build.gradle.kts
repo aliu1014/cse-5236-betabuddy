@@ -92,4 +92,5 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.android.libraries.places:places:3.5.0")
 
+    implementation("io.coil-kt:coil:2.7.0")
 }

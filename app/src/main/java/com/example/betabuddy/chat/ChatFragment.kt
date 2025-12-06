@@ -60,13 +60,25 @@ class ChatFragment : BaseLoggingFragment(R.layout.fragment_chat) {
         viewModel.setPeerName(partnerName)
 
         // Observe Firestore messages
+//        viewModel.messageRows.observe(viewLifecycleOwner) { rows ->
+//            chatMessages.clear()
+//            chatMessages.addAll(rows)
+//            chatAdapter.notifyDataSetChanged()
+//            chatListView.smoothScrollToPosition(chatMessages.size - 1)
+//
+//            // Mark them as read immediately
+//            viewModel.markThreadRead()
+//        }
         viewModel.messageRows.observe(viewLifecycleOwner) { rows ->
+            // Keep only the last 100 messages in memory
+            val limited = if (rows.size > 100) rows.takeLast(100) else rows
+
             chatMessages.clear()
-            chatMessages.addAll(rows)
+            chatMessages.addAll(limited)
+
             chatAdapter.notifyDataSetChanged()
             chatListView.smoothScrollToPosition(chatMessages.size - 1)
 
-            // Mark them as read immediately
             viewModel.markThreadRead()
         }
 
