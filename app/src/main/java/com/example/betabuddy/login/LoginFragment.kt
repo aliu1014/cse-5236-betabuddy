@@ -36,6 +36,7 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
         val passwordInput = view.findViewById<EditText>(R.id.etPassword)
         val loginButton = view.findViewById<Button>(R.id.btnLogin)
         val signupButton = view.findViewById<TextView>(R.id.btnSignup)
+        val tvLoginError  = view.findViewById<TextView>(R.id.tvLoginError)
 
         // Handle pressing Enter (Done) on keyboard to log in properly
         passwordInput.setOnEditorActionListener { _, actionId, _ ->
@@ -87,6 +88,9 @@ class LoginFragment : BaseLoggingFragment(R.layout.fragment_login){
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(requireContext(), "Please enter both email and password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
+            } else {
+                // Hide error if inputs are now valid
+                tvLoginError.visibility = View.GONE
             }
             //Attempt to sign in with Firebase
             auth.signInWithEmailAndPassword(email, password)
