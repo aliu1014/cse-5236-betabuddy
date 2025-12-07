@@ -61,9 +61,13 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
 
         viewModel.loadFriends()
 
-        val fromFindFriends = arguments?.getBoolean("fromFindFriends", false) ?: false
-        backButton.visibility = if (fromFindFriends) View.VISIBLE else View.GONE
-        backButton.setOnClickListener { parentFragmentManager.popBackStack() }
+        // Show a back button whenever there is something to go back to
+        val canGoBack = parentFragmentManager.backStackEntryCount > 0
+        backButton.visibility = if (canGoBack) View.VISIBLE else View.GONE
+
+        backButton.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
     }
 }
 
@@ -89,6 +93,32 @@ private class FriendsAdapter(
     override fun getItemCount() = data.size
 }
 
+//private class FriendVH(
+//    itemView: android.view.View,
+//    val onChatClick: (FriendEdge) -> Unit,
+//    val onRemoveClick: (FriendEdge) -> Unit
+//) : RecyclerView.ViewHolder(itemView) {
+//
+//    private val nameView = itemView.findViewById<android.widget.TextView>(R.id.tvFriendName)
+//    private val chatBtn = itemView.findViewById<android.widget.ImageButton>(R.id.btnRowChat)
+//    private val removeBtn = itemView.findViewById<android.widget.Button>(R.id.btnRowRemove)
+//    private val unreadView = itemView.findViewById<android.widget.TextView>(R.id.tvUnreadBadge)
+//
+//    fun bind(edge: FriendEdge) {
+//        nameView.text = edge.profile.name.ifBlank { edge.key }
+//
+//        if (edge.unread > 0) {
+//            unreadView.visibility = View.VISIBLE
+//            unreadView.text = edge.unread.toString()
+//        } else {
+//            unreadView.visibility = View.GONE
+//        }
+//
+//        chatBtn.setOnClickListener { onChatClick(edge) }
+//        removeBtn.setOnClickListener { onRemoveClick(edge) }
+//    }
+//}
+
 private class FriendVH(
     itemView: android.view.View,
     val onChatClick: (FriendEdge) -> Unit,
@@ -101,7 +131,17 @@ private class FriendVH(
     private val unreadView = itemView.findViewById<android.widget.TextView>(R.id.tvUnreadBadge)
 
     fun bind(edge: FriendEdge) {
-        nameView.text = edge.profile.name.ifBlank { edge.key }
+        val email = edge.key              // this is their email
+        val profile = edge.profile
+
+        // Use full name if set, otherwise use the part before "@"
+        val displayName = if (profile.name.isNotBlank()) {
+            profile.name
+        } else {
+            email.substringBefore("@")
+        }
+
+        nameView.text = displayName
 
         if (edge.unread > 0) {
             unreadView.visibility = View.VISIBLE

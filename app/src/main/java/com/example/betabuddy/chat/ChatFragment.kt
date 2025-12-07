@@ -10,13 +10,16 @@ import androidx.fragment.app.viewModels
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
 import com.example.betabuddy.friendlist.FriendsFragment
-import com.google.firebase.auth.FirebaseAuth // ⭐ NEW
-import com.example.betabuddy.data.FirestoreChatRepository // ⭐ NEW
+import com.google.firebase.auth.FirebaseAuth
+import com.example.betabuddy.data.FirestoreChatRepository
+import android.view.inputmethod.EditorInfo
+import android.view.KeyEvent
+
 /**
  * ChatFragment
  * ------------
- * This fragment handles the chat interface within the BetaBuddy app
- * It allows users to: send/view chat messages displayed in a ListView
+ * This fragment handles the chat interface within the BetaBuddy app.
+ * It allows users to send/view chat messages displayed in a ListView.
  */
 class ChatFragment : BaseLoggingFragment(R.layout.fragment_chat) {
     private lateinit var messageInput: EditText
@@ -29,18 +32,20 @@ class ChatFragment : BaseLoggingFragment(R.layout.fragment_chat) {
         ChatVMFactory(FirestoreChatRepository())
     }
 
-    //Where UI elements are connected and event listeners are defined
+    // Where UI elements are connected and event listeners are defined
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         messageInput = view.findViewById(R.id.etMessage)
         sendButton = view.findViewById(R.id.btnSend)
         chatListView = view.findViewById(R.id.lvChat)
-        //Set up a simple ArrayAdapter to display messages in the ListView
-        chatAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, chatMessages)
+
+        // Set up a simple ArrayAdapter to display messages in the ListView
+        chatAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, chatMessages)
         chatListView.adapter = chatAdapter
 
-        // Set up the Back button to navigate back to the FindFriendsFragment
+        // Back button -> FriendsFragment
         view.findViewById<Button>(R.id.btnBack).setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container_view, FriendsFragment())
@@ -59,18 +64,8 @@ class ChatFragment : BaseLoggingFragment(R.layout.fragment_chat) {
         // Pass name into ViewModel
         viewModel.setPeerName(partnerName)
 
-        // Observe Firestore messages
-//        viewModel.messageRows.observe(viewLifecycleOwner) { rows ->
-//            chatMessages.clear()
-//            chatMessages.addAll(rows)
-//            chatAdapter.notifyDataSetChanged()
-//            chatListView.smoothScrollToPosition(chatMessages.size - 1)
-//
-//            // Mark them as read immediately
-//            viewModel.markThreadRead()
-//        }
+        // Observe Firestore messages (limit to last 100)
         viewModel.messageRows.observe(viewLifecycleOwner) { rows ->
-            // Keep only the last 100 messages in memory
             val limited = if (rows.size > 100) rows.takeLast(100) else rows
 
             chatMessages.clear()
@@ -82,12 +77,33 @@ class ChatFragment : BaseLoggingFragment(R.layout.fragment_chat) {
             viewModel.markThreadRead()
         }
 
-        // Send a Firestore message, not just local UI
-        sendButton.setOnClickListener {
+        // Shared send logic
+        fun sendCurrentMessage() {
             val message = messageInput.text.toString().trim()
             if (message.isNotEmpty()) {
                 viewModel.send(message)
                 messageInput.text.clear()
+            }
+        }
+
+        // Send via button
+        sendButton.setOnClickListener {
+            sendCurrentMessage()
+        }
+
+        // Send via keyboard Enter / IME "Send"
+        messageInput.setOnEditorActionListener { _, actionId, event ->
+            val isImeSend = actionId == EditorInfo.IME_ACTION_SEND
+            val isEnterKey =
+                actionId == EditorInfo.IME_NULL &&
+                        event?.keyCode == KeyEvent.KEYCODE_ENTER &&
+                        event.action == KeyEvent.ACTION_DOWN
+
+            if (isImeSend || isEnterKey) {
+                sendCurrentMessage()
+                true
+            } else {
+                false
             }
         }
     }

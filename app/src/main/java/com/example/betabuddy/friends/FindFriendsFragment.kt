@@ -217,7 +217,8 @@ private class TextRowVH(
         val tvLocation = itemView.findViewById<android.widget.TextView>(R.id.tvLocation)
         val btnRequest = itemView.findViewById<android.widget.Button>(R.id.btnRequest)
 
-        tvName.text = text
+        val cleanText = text.replace(Regex("\\(Lead[^)]*\\)"), "").trim()
+        tvName.text = cleanText
         tvLocation.text = ""   // or keep whatever you were doing here
 
         // Clicking the **row** opens the profile

@@ -52,7 +52,8 @@
         android:text="@string/remove"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
-        android:backgroundTint="#E53935"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="#C62828"
         android:layout_marginStart="8dp"
         android:minHeight="36dp"
         android:paddingHorizontal="12dp" />
