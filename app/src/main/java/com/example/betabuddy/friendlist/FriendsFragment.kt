@@ -3,7 +3,6 @@ package com.example.betabuddy.friendlist
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -58,10 +57,6 @@ class FriendsFragment : BaseLoggingFragment(R.layout.fragment_friends) {
         // Combined LiveData of friend profiles plus unread counts
         viewModel.friendsWithUnread.observe(viewLifecycleOwner) { edges ->
             adapter.submit(edges)
-
-            if (edges.isEmpty()) {
-                Toast.makeText(requireContext(), "No friends yet. Add some!", Toast.LENGTH_SHORT).show()
-            }
         }
 
         viewModel.loadFriends()
