@@ -5,7 +5,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.betabuddy.model.FriendRequest
 import com.example.betabuddy.profile.User
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
 import android.location.Location
@@ -14,20 +13,40 @@ class FindFriendsRepository {
 
     /** One search hit with the document id (email) + the user payload */
     data class UserHit(val email: String, val user: User)
+
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+
     private var usersReg: ListenerRegistration? = null
+
     // Full objects used by the Fragment to get the email/docId at a row index
     private val _hits = MutableLiveData<List<UserHit>>(emptyList())
     val hits: MutableLiveData<List<UserHit>> get() = _hits
+
     // Pretty strings for your existing SimpleResultsAdapter
     private val _resultRows = MutableLiveData<List<String>>(emptyList())
     val resultRows: MutableLiveData<List<String>> get() = _resultRows
-    fun clear() { usersReg?.remove(); usersReg = null }
 
+    // Emails to exclude from search results
+    private var friendEmails: Set<String> = emptySet()
+    private var pendingRequestEmails: Set<String> = emptySet() // anyone with a pending req (in or out)
+
+    fun clear() {
+        usersReg?.remove()
+        usersReg = null
+        // (optional) you could also store/remove the listeners created in startListeningForExclusions()
+    }
+
+    /** Apply filtering (friends + pending) and build display strings. */
     private fun updateResults(list: List<UserHit>) {
-        _hits.value = list
-        _resultRows.value = list.map { hit ->
+        // Filter out friends and pending requests
+        val filtered = list.filter { hit ->
+            val email = hit.email
+            email !in friendEmails && email !in pendingRequestEmails
+        }
+
+        _hits.value = filtered
+        _resultRows.value = filtered.map { hit ->
             val u = hit.user
             val name = u.name.ifBlank { u.username.ifBlank { "Anonymous" } }
             val role = when {
@@ -54,23 +73,14 @@ class FindFriendsRepository {
                     val email = doc.id                       // <-- email is the doc id
                     if (email == me) return@mapNotNull null   // exclude myself
                     if (target.isNotEmpty() &&
-                        !u.location.equals(target, ignoreCase = true)) return@mapNotNull null
+                        !u.location.equals(target, ignoreCase = true)
+                    ) return@mapNotNull null
+
                     UserHit(email, u)
                 } ?: emptyList()
 
-                _hits.value = list
-                _resultRows.value = list.map { hit ->
-                    val u = hit.user
-                    val name = u.name.ifBlank { u.username.ifBlank { "Anonymous" } }
-                    val role = when {
-                        u.gradeLead.isNotBlank()    -> "Lead ${u.gradeLead}"
-                        u.gradeTopRope.isNotBlank() -> "Top rope ${u.gradeTopRope}"
-                        u.gradeBoulder.isNotBlank() -> "Boulder ${u.gradeBoulder}"
-                        else                        -> "Climber"
-                    }
-                    val loc = u.location.ifBlank { "Anywhere" }
-                    "$name ($role) — $loc"
-                }
+                // IMPORTANT: let updateResults handle exclusions + pretty strings
+                updateResults(list)
             }
     }
 
@@ -137,24 +147,15 @@ class FindFriendsRepository {
                     .document(meEmail)
                     .set(req)
                     .addOnSuccessListener {
-                        // Remove that user from the current search results
+                        // Mark it as pending locally and re-filter
+                        pendingRequestEmails = pendingRequestEmails + toEmail
+
+                        // Remove that user from the current search results immediately
                         val curr = _hits.value?.toMutableList() ?: mutableListOf()
                         val idx = curr.indexOfFirst { it.email == toEmail }
                         if (idx >= 0) {
                             curr.removeAt(idx)
-                            _hits.value = curr
-                            _resultRows.value = curr.map { hit ->
-                                val u = hit.user
-                                val name = u.name.ifBlank { u.username.ifBlank { "Anonymous" } }
-                                val role = when {
-                                    u.gradeLead.isNotBlank()    -> "Lead ${u.gradeLead}"
-                                    u.gradeTopRope.isNotBlank() -> "Top rope ${u.gradeTopRope}"
-                                    u.gradeBoulder.isNotBlank() -> "Boulder ${u.gradeBoulder}"
-                                    else                        -> "Climber"
-                                }
-                                val loc = u.location.ifBlank { "Anywhere" }
-                                "$name ($role) — $loc"
-                            }
+                            updateResults(curr)   // <-- use shared logic
                         }
                     }
             }
@@ -179,5 +180,50 @@ class FindFriendsRepository {
                 searchNearbyUsers(myLat, myLng, radiusMiles)
             }
     }
-}
 
+    /** Listen to my friends + requests to build exclusion sets. */
+    fun startListeningForExclusions() {
+        val me = auth.currentUser?.email ?: return
+
+        // 1) Friends list
+        db.collection("friends")
+            .document(me)
+            .collection("friendList")
+            .addSnapshotListener { snap, _ ->
+                friendEmails = snap?.documents
+                    ?.map { it.id }       // friend email as doc id
+                    ?.toSet()
+                    ?: emptySet()
+
+                // Re-filter current results when friends change
+                _hits.value?.let { updateResults(it) }
+            }
+
+        // 2) Requests involving me
+        // Incoming requests TO me
+        db.collection("friendRequests")
+            .document(me)
+            .collection("incoming")
+            .addSnapshotListener { snap, _ ->
+                val incoming = snap?.documents
+                    ?.mapNotNull { it.getString("senderEmail") }
+                    ?.toSet()
+                    ?: emptySet()
+
+                // Outgoing requests I sent (senderEmail == me)
+                db.collectionGroup("incoming")
+                    .whereEqualTo("senderEmail", me)
+                    .addSnapshotListener { outSnap, _ ->
+                        val outgoing = outSnap?.documents
+                            ?.mapNotNull { it.getString("recipientEmail") }
+                            ?.toSet()
+                            ?: emptySet()
+
+                        pendingRequestEmails = incoming + outgoing
+
+                        // Re-filter current results
+                        _hits.value?.let { updateResults(it) }
+                    }
+            }
+    }
+}

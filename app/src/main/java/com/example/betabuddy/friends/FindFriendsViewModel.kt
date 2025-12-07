@@ -11,6 +11,11 @@ class FindFriendsViewModel(
 ) : ViewModel() {
     val hits: LiveData<List<FindFriendsRepository.UserHit>> = repo.hits
     val resultRows: LiveData<List<String>> = repo.resultRows
+
+    init {
+        repo.startListeningForExclusions()
+    }
+
     fun search(location: String?) = repo.searchUsers(location)
     fun searchByCity(location: String?) = repo.searchUsers(location)
     fun searchNearby(lat: Double, lng: Double, radiusMiles: Double = 20.0) =
