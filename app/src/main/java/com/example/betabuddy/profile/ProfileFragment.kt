@@ -105,9 +105,9 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
             spinner.setSelection(0)
         }
 
-        setupSpinner(spGender,       R.array.gender_options)
+        setupSpinner(spGender, R.array.gender_options)
         setupSpinner(spGradeTopRope, R.array.toprope_grades)
-        setupSpinner(spGradeLead,    R.array.lead_grades)
+        setupSpinner(spGradeLead, R.array.lead_grades)
         setupSpinner(spGradeBoulder, R.array.boulder_grades)
 
         // Listen for map selection results
@@ -161,9 +161,9 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                     if (it >= 0) spGradeLead.setSelection(it)
                 }
 
-                cbHasGear.isChecked     = u.hasGear
+                cbHasGear.isChecked = u.hasGear
                 cbTopRopeCert.isChecked = u.hasTopRopeCert
-                cbLeadCert.isChecked    = u.hasLeadCert
+                cbLeadCert.isChecked = u.hasLeadCert
             }
         }
 
@@ -187,8 +187,8 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 return@setOnClickListener
             }
 
-            val feet        = etHeightFeet.text.toString().toIntOrNull() ?: 0
-            val inches      = etHeightInches.text.toString().toIntOrNull() ?: 0
+            val feet = etHeightFeet.text.toString().toIntOrNull() ?: 0
+            val inches = etHeightInches.text.toString().toIntOrNull() ?: 0
             val locationTxt = etLocation.text.toString().trim()
 
             var lat = pickedLat
@@ -199,6 +199,7 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 if (locationTxt.isNotEmpty()) {
                     try {
                         val results = withContext(Dispatchers.IO) {
+                            // Heavy work moved to IO thread
                             geocoder.getFromLocationName(locationTxt, 1)
                         }
                         if (!results.isNullOrEmpty()) {

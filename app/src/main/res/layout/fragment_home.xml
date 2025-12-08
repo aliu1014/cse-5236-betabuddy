@@ -11,121 +11,126 @@
         android:scaleType="centerCrop"
         android:alpha="0.18" />
 
-    <LinearLayout
-        android:orientation="vertical"
+    <!-- Scrollable content -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="24dp"
-        android:gravity="center_horizontal"
-        android:layout_gravity="center">
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="24dp"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center">
 
-        <!-- FIND FRIENDS ROCK BUTTON -->
-        <FrameLayout
-            android:id="@+id/btnFindFriends"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless">
-
-            <ImageView
-                android:id="@+id/imgFindFriendsRock"
-                android:layout_width="140dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/rockpic"
-                android:adjustViewBounds="true"
-                android:tint="@color/blue_transparent"
-                android:tintMode="src_atop" />
-
-            <TextView
+            <!-- FIND FRIENDS ROCK BUTTON -->
+            <FrameLayout
+                android:id="@+id/btnFindFriends"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/find_friends"
-                android:textColor="@android:color/white"
-                android:textStyle="bold" />
-        </FrameLayout>
+                android:layout_marginTop="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless">
 
-        <!-- VIEW PROFILE ROCK BUTTON -->
-        <FrameLayout
-            android:id="@+id/btnViewProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless">
+                <ImageView
+                    android:id="@+id/imgFindFriendsRock"
+                    android:layout_width="140dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/rockpic"
+                    android:adjustViewBounds="true"
+                    android:tint="@color/blue_transparent"
+                    android:tintMode="src_atop" />
 
-            <ImageView
-                android:layout_width="140dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/rockpic"
-                android:adjustViewBounds="true"
-                android:tint="@color/orange_transparent"
-                android:tintMode="src_atop" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/find_friends"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+            </FrameLayout>
 
-            <TextView
+            <!-- VIEW PROFILE ROCK BUTTON -->
+            <FrameLayout
+                android:id="@+id/btnViewProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/view_profile"
-                android:textColor="@android:color/white"
-                android:textStyle="bold" />
-        </FrameLayout>
+                android:layout_marginTop="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless">
 
-        <!-- VIEW FRIENDS ROCK BUTTON -->
-        <FrameLayout
-            android:id="@+id/btnViewFriends"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless">
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/rockpic"
+                    android:adjustViewBounds="true"
+                    android:tint="@color/orange_transparent"
+                    android:tintMode="src_atop" />
 
-            <ImageView
-                android:layout_width="140dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/rockpic"
-                android:adjustViewBounds="true"
-                android:tint="@color/brown_transparent"
-                android:tintMode="src_atop" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/view_profile"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+            </FrameLayout>
 
-            <TextView
+            <!-- VIEW FRIENDS ROCK BUTTON -->
+            <FrameLayout
+                android:id="@+id/btnViewFriends"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/view_friends"
-                android:textColor="@android:color/white"
-                android:textStyle="bold" />
-        </FrameLayout>
+                android:layout_marginTop="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless">
 
-        <!-- LOGOUT ROCK BUTTON -->
-        <FrameLayout
-            android:id="@+id/btnLogout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless">
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/rockpic"
+                    android:adjustViewBounds="true"
+                    android:tint="@color/brown_transparent"
+                    android:tintMode="src_atop" />
 
-            <ImageView
-                android:layout_width="140dp"
-                android:layout_height="wrap_content"
-                android:src="@drawable/rockpic"
-                android:adjustViewBounds="true"
-                android:tint="@color/dark_teal_transparent"
-                android:tintMode="src_atop" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/view_friends"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+            </FrameLayout>
 
-            <TextView
+            <!-- LOGOUT ROCK BUTTON -->
+            <FrameLayout
+                android:id="@+id/btnLogout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Logout"
-                android:textColor="@android:color/white"
-                android:textStyle="bold" />
-        </FrameLayout>
-    </LinearLayout>
+                android:layout_marginTop="20dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/rockpic"
+                    android:adjustViewBounds="true"
+                    android:tint="@color/dark_teal_transparent"
+                    android:tintMode="src_atop" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Logout"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>

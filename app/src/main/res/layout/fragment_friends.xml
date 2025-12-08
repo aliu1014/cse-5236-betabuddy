@@ -30,13 +30,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <!-- Friend list -->
+                <!-- Friends list: takes all remaining space and scrolls itself -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvFriends"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:layout_marginTop="12dp" />
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:paddingBottom="8dp" />
 
                 <!-- Back button -->
                 <Button
