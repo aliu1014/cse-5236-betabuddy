@@ -5,6 +5,7 @@ package com.example.betabuddy.profile
  * Matches the fields used in ProfileFragment and UserRepository.
  */
 data class User(
+    val profileImageBase64: String = "",
     val username: String = "",
     val location: String = "",
     val gender: String = "",

@@ -85,6 +85,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
 
+    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")

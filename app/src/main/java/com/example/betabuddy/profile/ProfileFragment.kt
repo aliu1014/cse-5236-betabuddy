@@ -20,6 +20,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.Locale
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
+import java.io.ByteArrayOutputStream
 
 /**
  * Displays and edits the full climbing profile for the current user.
@@ -36,7 +40,7 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
     private var pickedLng: Double? = null
     private var hasLocationFromMap: Boolean = false
     private var currentUser: User? = null
-
+    private var profileImageBase64: String? = null
     private lateinit var imageProfile: ShapeableImageView
 
     // Lazily created Geocoder so we don't allocate a new one every save
@@ -48,10 +52,16 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                imageProfile.load(it) {
-                    crossfade(true)
+                // Show it immediately
+                imageProfile.load(it) { crossfade(true) }
+
+                // Also encode & store as Base64 for Firestore
+                viewLifecycleOwner.lifecycleScope.launch {
+                    profileImageBase64 = encodeImageToBase64(it)
                 }
-                saveProfileImageUri(it)        // persist URI
+
+                // Optional local cache (per device only)
+                saveProfileImageUri(it)
             }
         }
 
@@ -182,15 +192,23 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 cbHasGear.isChecked = u.hasGear
                 cbTopRopeCert.isChecked = u.hasTopRopeCert
                 cbLeadCert.isChecked = u.hasLeadCert
+                profileImageBase64 = u.profileImageBase64
+                if (!u.profileImageBase64.isNullOrBlank()) {
+                    decodeBase64ToBitmap(u.profileImageBase64)?.let { bmp ->
+                        imageProfile.setImageBitmap(bmp)
+                    }
+                } else {
+                    imageProfile.setImageResource(R.drawable.default_pfp)
+                }
 
                 etNotes.setText(u.notes)
             }
         }
 
-        // Load any saved profile picture using Coil (downscaled + cached)
-        loadProfileImageUri()?.let { uri ->
-            imageProfile.load(uri) {
-                crossfade(true)
+        // Local cached image (for very first run / offline)
+        if (currentUser == null) {
+            loadProfileImageUri()?.let { uri ->
+                imageProfile.load(uri) { crossfade(true) }
             }
         }
 
@@ -238,7 +256,11 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 pickedLat = lat
                 pickedLng = lng
 
+                val imageBase64ToSave =
+                    profileImageBase64 ?: currentUser?.profileImageBase64.orEmpty()
+
                 val user = User(
+                    profileImageBase64 = imageBase64ToSave,
                     username       = username,
                     name           = etName.text.toString().trim(),
                     gender         = spGender.selectedItem.toString(),
@@ -316,6 +338,35 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
         // Initial load from Firestore
         viewModel.loadUser()
     }
+
+    private suspend fun encodeImageToBase64(uri: Uri): String? =
+        withContext(Dispatchers.IO) {
+            try {
+                val input = requireContext().contentResolver.openInputStream(uri)
+                    ?: return@withContext null
+
+                val bitmap = BitmapFactory.decodeStream(input)
+                input.close()
+
+                val out = ByteArrayOutputStream()
+                // 60% quality to keep under Firestore 1MB limit
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 60, out)
+                val bytes = out.toByteArray()
+                Base64.encodeToString(bytes, Base64.DEFAULT)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+
+    private fun decodeBase64ToBitmap(base64: String): Bitmap? =
+        try {
+            val bytes = Base64.decode(base64, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
 
     private fun saveProfileImageUri(uri: Uri) {
         val prefs = requireContext()

@@ -1,6 +1,9 @@
 package com.example.betabuddy.profile
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Base64
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -8,6 +11,7 @@ import android.widget.Toast
 import com.example.betabuddy.R
 import com.example.betabuddy.core.BaseLoggingFragment
 import com.example.betabuddy.friends.FindFriendsFragment
+import com.google.android.material.imageview.ShapeableImageView
 
 class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile) {
 
@@ -15,6 +19,8 @@ class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val imgProfile = view.findViewById<ShapeableImageView>(R.id.imgOtherProfile)
 
         val email = arguments?.getString(ARG_EMAIL)
         if (email.isNullOrBlank()) {
@@ -37,7 +43,7 @@ class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile
         val tvTopCert  = view.findViewById<TextView>(R.id.tvTopCert)
         val tvLeadCert = view.findViewById<TextView>(R.id.tvLeadCert)
         val tvNotes   = view.findViewById<TextView>(R.id.tvNotes)
-        // Set up the Back button to navigate back to the FindFriendsFragment
+        // Back → FindFriends
         view.findViewById<Button>(R.id.btnBack).setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container_view, FindFriendsFragment())
@@ -49,6 +55,15 @@ class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile
             if (u == null) {
                 Toast.makeText(requireContext(), "Could not load profile", Toast.LENGTH_SHORT).show()
                 return@getUserByEmail
+            }
+
+            // 🔹 Load profile image from Base64
+            if (!u.profileImageBase64.isNullOrBlank()) {
+                decodeBase64ToBitmap(u.profileImageBase64)?.let { bmp ->
+                    imgProfile.setImageBitmap(bmp)
+                } ?: imgProfile.setImageResource(R.drawable.default_pfp)
+            } else {
+                imgProfile.setImageResource(R.drawable.default_pfp)
             }
 
             tvName.text     = u.name.ifBlank { "Unknown name" }
@@ -69,6 +84,15 @@ class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile
         }
     }
 
+    private fun decodeBase64ToBitmap(base64: String): Bitmap? =
+        try {
+            val bytes = Base64.decode(base64, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+
     companion object {
         private const val ARG_EMAIL = "email"
 
@@ -79,3 +103,6 @@ class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile
         }
     }
 }
+
+
+
