@@ -170,6 +170,21 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Notes"
+                    android:textStyle="bold"
+                    android:paddingTop="12dp" />
+
+                <TextView
+                    android:id="@+id/tvNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No notes yet"
+                    android:textSize="16sp"
+                    android:paddingBottom="12dp" />
+
                 <!-- Back button -->
                 <Button
                     android:id="@+id/btnBack"

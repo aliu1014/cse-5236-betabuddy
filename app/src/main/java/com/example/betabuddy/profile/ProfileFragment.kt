@@ -77,6 +77,7 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
         val btnPickOnMap    = view.findViewById<Button>(R.id.btnPickOnMap)
         val btnSave         = view.findViewById<Button>(R.id.btnSaveProfile)
         val btnDelete       = view.findViewById<Button>(R.id.btnDeleteProfile)
+        val etNotes        = view.findViewById<EditText>(R.id.etNotes)
 
         // Spinner helper
         fun setupSpinner(spinner: Spinner, arrayRes: Int) {
@@ -158,7 +159,6 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
 
                 etHeightFeet.setText(if (u.feet > 0) u.feet.toString() else "")
                 etHeightInches.setText(if (u.inches > 0) u.inches.toString() else "")
-
                 if (!hasLocationFromMap && !u.location.isNullOrBlank()) {
                     etLocation.setText(u.location)
                 }
@@ -182,6 +182,8 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 cbHasGear.isChecked = u.hasGear
                 cbTopRopeCert.isChecked = u.hasTopRopeCert
                 cbLeadCert.isChecked = u.hasLeadCert
+
+                etNotes.setText(u.notes)
             }
         }
 
@@ -252,7 +254,9 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                     hasLeadCert    = cbLeadCert.isChecked,
                     location       = locationTxt,
                     latitude       = lat,
-                    longitude      = lng
+                    longitude      = lng,
+                    notes          = etNotes.text.toString().trim()
+
                 )
                 viewModel.saveUser(user) { ok ->
                     Toast.makeText(

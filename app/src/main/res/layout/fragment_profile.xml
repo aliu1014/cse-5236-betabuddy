@@ -186,6 +186,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Lead Certified" />
+                <!-- Notes / Bio -->
+                <EditText
+                    android:id="@+id/etNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:hint="Notes (e.g., 'Climb after 6pm', 'New to the area', etc.)"
+                    android:gravity="top"
+                    android:background="@android:drawable/edit_text"
+                    android:padding="12dp"
+                    android:inputType="textMultiLine"
+                    android:maxLines="5"
+                    android:scrollbars="vertical" />
+
 
                 <!-- Save button INSIDE scroll area -->
                 <Button

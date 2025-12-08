@@ -36,7 +36,7 @@ class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile
         val tvGear     = view.findViewById<TextView>(R.id.tvGear)
         val tvTopCert  = view.findViewById<TextView>(R.id.tvTopCert)
         val tvLeadCert = view.findViewById<TextView>(R.id.tvLeadCert)
-
+        val tvNotes   = view.findViewById<TextView>(R.id.tvNotes)
         // Set up the Back button to navigate back to the FindFriendsFragment
         view.findViewById<Button>(R.id.btnBack).setOnClickListener {
             parentFragmentManager.beginTransaction()
@@ -65,6 +65,7 @@ class OtherProfileFragment : BaseLoggingFragment(R.layout.fragment_other_profile
             tvGear.text     = if (u.hasGear) "Has climbing gear" else "No gear listed"
             tvTopCert.text  = if (u.hasTopRopeCert) "Top rope certified" else "No top rope cert"
             tvLeadCert.text = if (u.hasLeadCert) "Lead certified" else "No lead cert"
+            tvNotes.text = if (u.notes.isNotBlank()) u.notes else "No notes yet"
         }
     }
 
