@@ -12,8 +12,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.hamcrest.Matchers.allOf
 
-private const val TEST_EMAIL = "test@example.com"
-private const val TEST_PASSWORD = "password123"
+private const val TEST_EMAIL = "test1@example.com"
+private const val TEST_PASSWORD = "password1234"
 
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {

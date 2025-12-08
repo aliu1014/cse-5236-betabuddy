@@ -1,21 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">   <!-- ✅ keeps content out of status bar/notch -->
 
-    <!-- Google Map -->
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <!-- Top search bar -->
+    <LinearLayout
+        android:id="@+id/searchBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Confirm button over the map -->
-    <Button
-        android:id="@+id/btnUseThisLocation"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Use this location"
-        android:layout_margin="16dp"
-        android:layout_gravity="bottom|center_horizontal" />
-</FrameLayout>
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:background="#CCFFFFFF"
+        android:elevation="4dp"
+        android:layout_alignParentTop="true">
+
+    <EditText
+        android:id="@+id/etSearchLocation"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:hint="Search city or address"
+        android:singleLine="true"
+        android:padding="8dp" />
+
+    <Button
+        android:id="@+id/btnSearch"
+        android:layout_width="64dp"
+        android:layout_height="40dp"
+        android:text="Go" />
+    </LinearLayout>
+
+
+    <fragment
+    android:id="@+id/map"
+    android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@id/searchBar"
+    android:layout_above="@id/btnUseThisLocation" />
+
+
+    <Button
+    android:id="@+id/btnUseThisLocation"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:text="USE THIS LOCATION"
+    android:layout_alignParentBottom="true"
+    android:background="#FFE0E0E0" />
+</RelativeLayout>
+
+
+

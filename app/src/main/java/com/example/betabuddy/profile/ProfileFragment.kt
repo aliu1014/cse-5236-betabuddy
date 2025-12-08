@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +34,9 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
     // Coordinates picked on the map (or geocoded from text)
     private var pickedLat: Double? = null
     private var pickedLng: Double? = null
+    private var hasLocationFromMap: Boolean = false
+    private var currentUser: User? = null
+
     private lateinit var imageProfile: ShapeableImageView
 
     // Lazily created Geocoder so we don't allocate a new one every save
@@ -46,7 +48,6 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                // Coil will automatically downscale and cache this image
                 imageProfile.load(it) {
                     crossfade(true)
                 }
@@ -96,7 +97,12 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 ): View {
                     val v = super.getDropDownView(position, convertView, parent)
                     val tv = v as TextView
-                    tv.setTextColor(if (position == 0) android.graphics.Color.GRAY else android.graphics.Color.BLACK)
+                    tv.setTextColor(
+                        if (position == 0)
+                            android.graphics.Color.GRAY
+                        else
+                            android.graphics.Color.BLACK
+                    )
                     return v
                 }
             }
@@ -118,6 +124,14 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
             pickedLat = bundle.getDouble("lat")
             pickedLng = bundle.getDouble("lng")
             val label = bundle.getString("label") ?: ""
+
+            hasLocationFromMap = true
+            Toast.makeText(
+                requireContext(),
+                "Location set to: $label",
+                Toast.LENGTH_SHORT
+            ).show()
+
             etLocation.setText(label)
         }
 
@@ -132,9 +146,11 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 .commit()
         }
 
-        // Pre-fill from Firestore
+        // Observe user from Firestore
         viewModel.user.observe(viewLifecycleOwner) { u ->
             if (u != null) {
+                currentUser = u
+
                 etUsername.setText(u.username)
                 etName.setText(u.name)
                 etAge.setText(if (u.age != 0) u.age.toString() else "")
@@ -142,9 +158,11 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
 
                 etHeightFeet.setText(if (u.feet > 0) u.feet.toString() else "")
                 etHeightInches.setText(if (u.inches > 0) u.inches.toString() else "")
-                etLocation.setText(u.location)
 
-                // Restore saved coords for this user
+                if (!hasLocationFromMap && !u.location.isNullOrBlank()) {
+                    etLocation.setText(u.location)
+                }
+
                 pickedLat = u.latitude
                 pickedLng = u.longitude
 
@@ -191,10 +209,9 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
             val inches = etHeightInches.text.toString().toIntOrNull() ?: 0
             val locationTxt = etLocation.text.toString().trim()
 
-            var lat = pickedLat
-            var lng = pickedLng
+            var lat = pickedLat ?: currentUser?.latitude
+            var lng = pickedLng ?: currentUser?.longitude
 
-            // Run geocoding + save logic in a coroutine
             viewLifecycleOwner.lifecycleScope.launch {
                 if (locationTxt.isNotEmpty()) {
                     try {
@@ -216,50 +233,46 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                     }
                 }
 
-                // Remember the last resolved coordinates in the fragment
                 pickedLat = lat
                 pickedLng = lng
 
                 val user = User(
-                    username      = username,
-                    name          = etName.text.toString().trim(),
-                    gender        = spGender.selectedItem.toString(),
-                    age           = etAge.text.toString().toIntOrNull() ?: 0,
-                    feet          = feet,
-                    inches        = inches,
-                    weight        = etWeight.text.toString().toIntOrNull() ?: 0,
-                    gradeTopRope  = spGradeTopRope.selectedItem.toString(),
-                    gradeBoulder  = spGradeBoulder.selectedItem.toString(),
-                    gradeLead     = spGradeLead.selectedItem.toString(),
-                    hasGear       = cbHasGear.isChecked,
-                    hasTopRopeCert= cbTopRopeCert.isChecked,
-                    hasLeadCert   = cbLeadCert.isChecked,
-                    location      = locationTxt,
-                    latitude      = lat,
-                    longitude     = lng
+                    username       = username,
+                    name           = etName.text.toString().trim(),
+                    gender         = spGender.selectedItem.toString(),
+                    age            = etAge.text.toString().toIntOrNull() ?: 0,
+                    feet           = feet,
+                    inches         = inches,
+                    weight         = etWeight.text.toString().toIntOrNull() ?: 0,
+                    gradeTopRope   = spGradeTopRope.selectedItem.toString(),
+                    gradeBoulder   = spGradeBoulder.selectedItem.toString(),
+                    gradeLead      = spGradeLead.selectedItem.toString(),
+                    hasGear        = cbHasGear.isChecked,
+                    hasTopRopeCert = cbTopRopeCert.isChecked,
+                    hasLeadCert    = cbLeadCert.isChecked,
+                    location       = locationTxt,
+                    latitude       = lat,
+                    longitude      = lng
                 )
+                viewModel.saveUser(user) { ok ->
+                    Toast.makeText(
+                        requireContext(),
+                        if (ok) "Profile saved!" else "Save failed.",
+                        Toast.LENGTH_SHORT
+                    ).show()
 
-                // First: ensure username not taken
-                viewModel.usernameExists(username) { exists ->
-                    if (exists) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Username already taken!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        viewModel.saveUser(user) { ok ->
-                            Toast.makeText(
-                                requireContext(),
-                                if (ok) "Profile saved!" else "Save failed.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            if (ok) viewModel.loadUser()
-                        }
+                    if (ok) {
+                        // Update local state so everything is immediately in sync
+                        currentUser = user
+                        pickedLat = lat
+                        pickedLng = lng
+                        hasLocationFromMap = false  // optional: we now trust the text+geocode
                     }
                 }
             }
         }
+
+
 
         // DELETE PROFILE
         btnDelete.setOnClickListener {
@@ -296,7 +309,7 @@ class ProfileFragment : BaseLoggingFragment(R.layout.fragment_profile) {
                 .show()
         }
 
-        // Initial load
+        // Initial load from Firestore
         viewModel.loadUser()
     }
 
